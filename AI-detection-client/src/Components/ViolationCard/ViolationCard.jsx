@@ -1,4 +1,8 @@
-function ViolationCard() {
+function ViolationCard({ setModalShow }) {
+    const handleModalShow = () => {
+        setModalShow(true);
+    };
+
     return (
         <div className="col">
             <div className="card h-100 bg-body-secondary">
@@ -19,16 +23,16 @@ function ViolationCard() {
                     </div>
                 </div>
                 <div className="card-footer">
-                    <div class="d-grid gap-2">
-                        <button class="btn btn-primary" type="button" onClick={() => setModalShow(true)}>
+                    <div className="d-grid gap-2">
+                        <button className="btn btn-primary" type="button" onClick={() => handleModalShow()}>
                             Watch video
                         </button>
                     </div>
-                    <div class="mt-2 d-flex flex-row justify-content-between">
-                        <button class="btn btn-danger flex-fill me-2" type="button">
+                    <div className="mt-2 d-flex flex-row justify-content-between">
+                        <button className="btn btn-danger flex-fill me-2" type="button">
                             Report
                         </button>
-                        <button class="btn btn-success flex-fill ms-2" type="button">
+                        <button className="btn btn-success flex-fill ms-2" type="button">
                             Accept
                         </button>
                     </div>

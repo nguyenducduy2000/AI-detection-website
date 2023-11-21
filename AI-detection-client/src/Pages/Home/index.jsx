@@ -9,11 +9,11 @@ function Home() {
     return (
         <>
             <div class="container-fluid text-center mx-n2">
-                <div className="mt-1 row row-cols-1 row-cols-xl-4 row-cols-lg-3 row-cols-md-2 g-4 justify-content-between">
-                    <ViolationCard />
+                <div className="mt-1 row row-cols-1 row-cols-xl-4 row-cols-lg-3 row-cols-md-2 g-4 justify-content-start">
+                    <ViolationCard setModalShow={setModalShow} />
                 </div>
             </div>
-            <PaginationPage />
+            <PaginationPage onClick={() => setModalShow(true)} />
             <ModalVideo show={modalShow} onHide={() => setModalShow(false)} />
         </>
     );
