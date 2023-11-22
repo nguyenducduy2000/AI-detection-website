@@ -14,8 +14,20 @@ function ModalVideo(props) {
                     or not that detection is valid.
                 </p>
             </Modal.Body>
-            <Modal.Footer>
-                <Button onClick={props.onHide}>Close</Button>
+            <Modal.Footer className="d-flex flex-column flex-fill">
+                <div className="mt-2 d-flex flex-row justify-content-around w-100">
+                    <Button variant="danger" className="flex-fill me-2">
+                        Reject
+                    </Button>
+                    <Button variant="success" className="flex-fill ms-2">
+                        Accept
+                    </Button>
+                </div>
+                <div className="mt-2 ms-auto p-2 justify-content-end">
+                    <Button variant="primary" onClick={props.onHide}>
+                        Close
+                    </Button>
+                </div>
             </Modal.Footer>
         </Modal>
     );
