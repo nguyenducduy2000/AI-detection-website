@@ -6,6 +6,10 @@ import PaginationPage from '~/Components/PaginationPage';
 function Home() {
     const [modalShow, setModalShow] = useState(false);
 
+    const handleModalHide = () => {
+        setModalShow(false);
+    };
+
     return (
         <>
             <div className="container-fluid text-center mx-n2">
@@ -21,7 +25,7 @@ function Home() {
                 </div>
             </div>
             <PaginationPage onClick={() => setModalShow(true)} />
-            <ModalVideo show={modalShow} onHide={() => setModalShow(false)} />
+            <ModalVideo show={modalShow} onHide={handleModalHide} />
         </>
     );
 }

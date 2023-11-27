@@ -1,7 +1,14 @@
+import PropTypes from 'prop-types';
+
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 
-function ModalVideo(props) {
+function ModalVideo({ show, onHide, ...passProps }) {
+    const props = {
+        show,
+        ...passProps,
+    };
+
     return (
         <Modal {...props} size="xl" aria-labelledby="contained-modal-title-vcenter" centered>
             <Modal.Header closeButton>
@@ -24,7 +31,7 @@ function ModalVideo(props) {
                     </Button>
                 </div>
                 <div className="mt-2 ms-auto p-2 justify-content-end">
-                    <Button variant="primary" onClick={props.onHide}>
+                    <Button variant="primary" onClick={onHide}>
                         Close
                     </Button>
                 </div>
@@ -32,5 +39,10 @@ function ModalVideo(props) {
         </Modal>
     );
 }
+
+ModalVideo.propTypes = {
+    show: PropTypes.bool,
+    onHide: PropTypes.func,
+};
 
 export default ModalVideo;

@@ -1,3 +1,5 @@
+import PropTypes from 'prop-types';
+
 function ViolationCard({ setModalShow }) {
     const handleModalShow = () => {
         setModalShow(true);
@@ -41,5 +43,9 @@ function ViolationCard({ setModalShow }) {
         </div>
     );
 }
+
+ViolationCard.propTypes = {
+    setModalShow: PropTypes.func.isRequired,
+};
 
 export default ViolationCard;

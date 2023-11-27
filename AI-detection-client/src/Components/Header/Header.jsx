@@ -1,13 +1,14 @@
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
-import Filter from '~Components/Filter';
 import Collapse from 'react-bootstrap/Collapse';
 import { Link } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
-
 import { useState, useRef, useEffect } from 'react';
 import clsx from 'clsx';
+
+import Filter from '~Components/Filter';
+import config from '~/config';
 
 function Header() {
     const [activeLink, setActiveLink] = useState('home');
@@ -26,13 +27,19 @@ function Header() {
         }
     }, [activeLink]);
 
-    const handleScrollIntoView = () => {
-        filterItemRef.current.scrollIntoView({
-            behavior: 'smooth',
-            block: 'center',
-            inline: 'center',
-        });
-    };
+    useEffect(() => {
+        const handleScrollIntoView = setTimeout(() => {
+            if (filterItemRef.current) {
+                filterItemRef.current.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                    inline: 'center',
+                });
+            }
+        }, 150);
+
+        return () => clearTimeout(handleScrollIntoView);
+    }, [open]);
 
     return (
         <>
@@ -46,7 +53,7 @@ function Header() {
                                 <Link
                                     ref={homeLink}
                                     className={clsx('nav-link', { active: activeLink === 'home' })}
-                                    to="/"
+                                    to={config.routes.home}
                                     onClick={() => {
                                         setActiveLink('home');
                                         setOpen(false);
@@ -59,7 +66,7 @@ function Header() {
                                 <Link
                                     ref={chartLink}
                                     className={clsx('nav-link', { active: activeLink === 'link' })}
-                                    to="/chart"
+                                    to={config.routes.chart}
                                     onClick={() => {
                                         setActiveLink('link');
                                         setOpen(false);
@@ -72,7 +79,6 @@ function Header() {
                                 <Button
                                     onClick={() => {
                                         setOpen(!open);
-                                        handleScrollIntoView();
                                     }}
                                     aria-controls="example-collapse-text"
                                     aria-expanded={open}
@@ -84,11 +90,15 @@ function Header() {
                     </Navbar.Collapse>
                 </Container>
             </Navbar>
-            <Collapse in={open}>
-                <div id="nav-collapse-filter">
-                    <Filter ref={filterItemRef} />
-                </div>
-            </Collapse>
+
+            {/* The div is used to mount ref onto the collapse component */}
+            <div ref={filterItemRef}>
+                <Collapse in={open}>
+                    <div id="nav-collapse-filter">
+                        <Filter />
+                    </div>
+                </Collapse>
+            </div>
         </>
     );
 }
