@@ -6,6 +6,7 @@ import Modal from 'react-bootstrap/Modal';
 function ModalVideo({ show, onHide, ...passProps }) {
     const props = {
         show,
+        onHide,
         ...passProps,
     };
 
