@@ -3,24 +3,26 @@ import PropTypes from 'prop-types';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 
-function ModalVideo({ show, onHide, ...passProps }) {
+function ModalVideo({ show, onHide, videoData, ...passProps }) {
     const props = {
         show,
         onHide,
         ...passProps,
     };
 
+    // console.log(videoData);
+
     return (
         <Modal {...props} size="xl" aria-labelledby="contained-modal-title-vcenter" centered>
             <Modal.Header closeButton>
-                <Modal.Title id="contained-modal-title-vcenter">Violation name</Modal.Title>
+                <Modal.Title id="contained-modal-title-vcenter">{videoData.title}</Modal.Title>
             </Modal.Header>
-            <Modal.Body>
-                <h4>Detection modal</h4>
-                <p>
-                    This modal is used to watch detection videos got from AI cameras. Our mission is to verify whether
-                    or not that detection is valid.
-                </p>
+            <Modal.Body className="d-flex flex-fill">
+                <div className="ratio ratio-16x9">
+                    <video controls>
+                        <source src={videoData.videoURL} type="video/mp4" />
+                    </video>
+                </div>
             </Modal.Body>
             <Modal.Footer className="d-flex flex-column flex-fill">
                 <div className="mt-2 d-flex flex-row justify-content-around w-100">
@@ -44,6 +46,7 @@ function ModalVideo({ show, onHide, ...passProps }) {
 ModalVideo.propTypes = {
     show: PropTypes.bool,
     onHide: PropTypes.func,
+    videoData: PropTypes.object.isRequired,
 };
 
 export default ModalVideo;
