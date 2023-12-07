@@ -1,9 +1,10 @@
 var express = require('express');
 var router = express.Router();
 
+// const { gcs } = require('../index');
 
-router.get('/', (req, res) => {
-    res.send('Hello World!')
-})
+const siteController = require('../app/controllers/SiteController');
+
+router.get('/', siteController.index);
 
 module.exports = router;
