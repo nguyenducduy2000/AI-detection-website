@@ -14,6 +14,7 @@ dist-ssr
 *.local
 credentials
 /src/public
+cloudsql.txt
 
 # Editor directories and files
 .vscode/*

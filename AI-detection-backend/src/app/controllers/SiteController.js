@@ -16,10 +16,11 @@ class SiteController {
                 imageURL: row.imageURL,
                 videoURL: row.videoURL,
             }));
-            console.log(data);
+            // console.log(data);
             res.send(data);
         } catch (err) {
             console.error(err);
+            res.status(500).send({ error: 'Internal Server Error' });
         } finally {
             try {
                 // await pool.end();

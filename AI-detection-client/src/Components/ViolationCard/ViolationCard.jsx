@@ -1,6 +1,10 @@
 import PropTypes from 'prop-types';
 
-function ViolationCard({ data, setModalShow, handleCardClick }) {
+function ViolationCard({ data, setModalShow, handleCardClick, loading }) {
+    if (loading) {
+        return <h2>Loading...</h2>;
+    }
+
     const handleModalShow = () => {
         handleCardClick(data.id);
         setModalShow(true);
@@ -59,10 +63,10 @@ function ViolationCard({ data, setModalShow, handleCardClick }) {
 }
 
 ViolationCard.propTypes = {
-    selected: PropTypes.bool.isRequired,
     data: PropTypes.object.isRequired,
     setModalShow: PropTypes.func.isRequired,
     handleCardClick: PropTypes.func.isRequired,
+    loading: PropTypes.bool,
 };
 
 export default ViolationCard;

@@ -1,1 +1,1 @@
-SELECT * FROM demoEvent;
+DROP TABLE demoEvent;

@@ -10,12 +10,13 @@ const getIpType = () => (process.env.PRIVATE_IP === '1' || process.env.PRIVATE_I
 
 // connectWithConnector initializes a connection pool for a Cloud SQL instance
 // of MySQL using the Cloud SQL Node.js Connector.
+const connector = new Connector();
+
 const connectWithConnector = async (config) => {
     // Note: Saving credentials in environment variables is convenient, but not
     // secure - consider a more secure solution such as
     // Cloud Secret Manager (https://cloud.google.com/secret-manager) to help
     // keep secrets safe.
-    const connector = new Connector();
     const clientOpts = await connector.getOptions({
         instanceConnectionName: process.env.INSTANCE_CONNECTION_NAME,
         ipType: getIpType(),
@@ -32,9 +33,12 @@ const connectWithConnector = async (config) => {
     return mysql.createPool(dbConfig);
 };
 
-const getConnect = async () => {
-    const pool = await connectWithConnector();
+let pool;
 
+const getConnect = async () => {
+    if (!pool) {
+        pool = await connectWithConnector();
+    }
     return await pool.getConnection();
 };
 
