@@ -2,6 +2,7 @@ import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import Collapse from 'react-bootstrap/Collapse';
+import ToggleButton from 'react-bootstrap/ToggleButton';
 import { Link } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import { useState, useRef, useEffect } from 'react';
@@ -16,6 +17,9 @@ function Header() {
     const homeLink = useRef(null);
     const chartLink = useRef(null);
     const filterItemRef = useRef(null);
+
+    // Toggle button settings
+    const [checked, setChecked] = useState(true);
 
     useEffect(() => {
         if (activeLink === 'home') {
@@ -85,6 +89,19 @@ function Header() {
                                 >
                                     Filter
                                 </Button>
+                            </Nav.Item>
+                            <Nav.Item>
+                                <ToggleButton
+                                    className="mb-2"
+                                    id="toggle-check"
+                                    type="checkbox"
+                                    variant="outline-success"
+                                    checked={checked}
+                                    value="1"
+                                    onChange={(e) => setChecked(e.currentTarget.checked)}
+                                >
+                                    Realtime: {checked ? 'ON' : 'OFF'}
+                                </ToggleButton>
                             </Nav.Item>
                         </Nav>
                     </Navbar.Collapse>

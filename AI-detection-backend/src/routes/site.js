@@ -6,5 +6,7 @@ var router = express.Router();
 const siteController = require('../app/controllers/SiteController');
 
 router.get('/', siteController.index);
+router.put('/accept', siteController.accept);
+router.put('/reject', siteController.reject);
 
 module.exports = router;

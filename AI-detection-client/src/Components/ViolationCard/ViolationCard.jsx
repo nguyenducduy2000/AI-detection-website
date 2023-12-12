@@ -1,13 +1,25 @@
+import { useRef } from 'react';
 import PropTypes from 'prop-types';
+import clsx from 'clsx';
 
-function ViolationCard({ data, setModalShow, handleCardClick, loading }) {
+import './ViolationCard.module.css';
+
+function ViolationCard({ data, handleModalVideoToggle, handleModalConfirmToggle, handlePassButtonRef, loading }) {
+    const acceptButtonRef = useRef();
+    const rejectButtonRef = useRef();
+
     if (loading) {
         return <h2>Loading...</h2>;
     }
 
-    const handleModalShow = () => {
-        handleCardClick(data.id);
-        setModalShow(true);
+    const handleWatchVideo = () => {
+        handleModalVideoToggle(data.messageid);
+    };
+
+    const handleToggleModalConfirm = (btnRef) => {
+        // console.log(btnRef.current);
+        handleModalConfirmToggle(data.messageid);
+        handlePassButtonRef(btnRef.current);
     };
 
     return (
@@ -18,21 +30,30 @@ function ViolationCard({ data, setModalShow, handleCardClick, loading }) {
                     className="card-img-top"
                     alt="..."
                     onClick={() => {
-                        handleModalShow();
+                        handleWatchVideo(data.messageid);
                     }}
                 />
                 <div className="card-body">
-                    <h5 className="card-title">{data.title}</h5>
-                    <div className="d-flex flex-row justify-content-between">
-                        <div className="d-flex flex-column text-start">
-                            <div className="card-text">Locaion:</div>
-                            <div className="card-text">Type:</div>
-                            <div className="card-text">{data.timestamp}</div>
+                    <h5 className="card-title">{data.messageid}</h5>
+                    <div className="d-flex flex-column justify-content-between align-items-center">
+                        <div className="card-text">
+                            <text className="fw-bold">Locaion_id:</text> {data.place_id}
                         </div>
-                        <div className="d-flex flex-column text-start">
-                            <div className="card-text">Date:</div>
-                            <div className="card-text">Vehicle type: </div>
-                            <div className="card-text">Additional information: </div>
+                        <div className="card-text">
+                            <text className="fw-bold">Event type:</text> {data.event_id}
+                        </div>
+                        <div className={clsx('card-text', 'card-timestamp')}>
+                            <text className="fw-bold">Timestamp:</text> {data.timestamp}
+                        </div>
+                        <div className="card-text">
+                            <text className="fw-bold">Sensor_id:</text> {data.sensor_id}
+                        </div>
+                        <div className="card-text">
+                            <text className="fw-bold">Detection type:</text> {data.object_id}{' '}
+                        </div>
+                        <div className="card-text">
+                            <text className="fw-bold">Status:</text>{' '}
+                            {data.status === null ? 'Not checked' : data.status ? 'Approved' : 'Rejected'}
                         </div>
                     </div>
                 </div>
@@ -42,17 +63,33 @@ function ViolationCard({ data, setModalShow, handleCardClick, loading }) {
                             className="btn btn-primary"
                             type="button"
                             onClick={() => {
-                                handleModalShow();
+                                handleModalVideoToggle(data.messageid);
                             }}
                         >
                             Watch video
                         </button>
                     </div>
-                    <div className="mt-2 d-flex flex-row justify-content-between">
-                        <button className="btn btn-danger flex-fill me-2" type="button">
+                    <div className={clsx('mt-2', 'd-flex', 'flex-row', 'justify-content-between')}>
+                        <button
+                            ref={rejectButtonRef}
+                            className={clsx('btn', 'btn-danger', 'flex-fill', 'me-2', 'reject-btn')}
+                            type="button"
+                            onClick={() => {
+                                handleToggleModalConfirm(rejectButtonRef);
+                            }}
+                            disabled={loading}
+                        >
                             Report
                         </button>
-                        <button className="btn btn-success flex-fill ms-2" type="button">
+                        <button
+                            ref={acceptButtonRef}
+                            className={clsx('btn', 'btn-success', 'flex-fill', 'ms-2', 'accept-btn')}
+                            type="button"
+                            onClick={() => {
+                                handleToggleModalConfirm(acceptButtonRef);
+                            }}
+                            disabled={loading}
+                        >
                             Accept
                         </button>
                     </div>
@@ -64,8 +101,9 @@ function ViolationCard({ data, setModalShow, handleCardClick, loading }) {
 
 ViolationCard.propTypes = {
     data: PropTypes.object.isRequired,
-    setModalShow: PropTypes.func.isRequired,
-    handleCardClick: PropTypes.func.isRequired,
+    handleModalVideoToggle: PropTypes.func.isRequired,
+    handleModalConfirmToggle: PropTypes.func.isRequired,
+    handlePassButtonRef: PropTypes.func.isRequired,
     loading: PropTypes.bool,
 };
 

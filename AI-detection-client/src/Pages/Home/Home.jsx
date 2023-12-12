@@ -1,38 +1,57 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import Spinner from 'react-bootstrap/Spinner';
 
 import ModalVideo from '~/Components/ModalVideo';
+import ModalConfirm from '~/Components/ModalConfirm';
 import ViolationCard from '~/Components/ViolationCard/ViolationCard';
 import PaginationPage from '~/Components/PaginationPage';
 import renderService from '~/services/renderService';
 
 function Home() {
-    const [modalShow, setModalShow] = useState(false);
-    const [selectedVideoId, setSelectedVideoId] = useState(null);
-    const [selectedVideoData, setSelectedVideoData] = useState(null);
+    // ModalVideo setting
+    const [modalVideoShow, setModalVideoShow] = useState(false);
+    const [selectedEvent, setSelectedEvent] = useState(null);
+    const [events, setEvents] = useState([]);
+
+    // ModalConfirm setting
+    const [modalConfirmShow, setModalConfirmShow] = useState(false);
+    const [eventChoice, setEventChoice] = useState();
+    const [apiCallSuccessful, setApiCallSuccessful] = useState(false); // Track API call success
+    const handlePassButtonRef = useCallback((BtnRef) => {
+        // console.log(BtnRef);
+        setEventChoice(BtnRef);
+    }, []);
 
     //  Paginations setting
-    const [events, setEvents] = useState([]);
     const [loading, setLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
     const [eventsPerPage] = useState(10);
 
-    const handleModalHide = () => {
-        setModalShow(false);
-        setSelectedVideoId(null);
-    };
+    const handleCardClick = useCallback(
+        (id) => {
+            const thisData = events.find((data) => data['messageid'] === id);
+            setSelectedEvent(thisData);
+        },
+        [events],
+    );
+    const handleModalVideoToggle = useCallback(
+        (videoId) => {
+            setModalVideoShow((prevModalShow) => !prevModalShow);
+            handleCardClick(videoId);
+        },
+        [handleCardClick],
+    );
 
-    const handleModalShow = (videoId) => {
-        setModalShow(true);
-        setSelectedVideoId(videoId);
-    };
-
-    const handleCardClick = (id) => {
-        console.log('Data ID:', id);
-        const thisData = events.find((data) => data['id'] === id);
-        setSelectedVideoData(thisData);
-        // console.log('selectedVideoData:', selectedVideoData);
-    };
+    const handleModalConfirmToggle = useCallback(
+        (videoId) => {
+            if (modalVideoShow) {
+                handleModalVideoToggle();
+            }
+            setModalConfirmShow((prevModalConfirmShow) => !prevModalConfirmShow);
+            handleCardClick(videoId);
+        },
+        [handleModalVideoToggle, modalVideoShow, handleCardClick],
+    );
 
     // const testData = events.find((data) => data.id === 1);
     // console.log(testData['id']);
@@ -46,9 +65,9 @@ function Home() {
         };
 
         axiosFetchEvents();
-    }, []);
+    }, [apiCallSuccessful]);
 
-    // Get current events
+    // Get current events when change page
     const indexOfLastEvent = currentPage * eventsPerPage;
     const indexOfFirstEvent = indexOfLastEvent - eventsPerPage;
     const currentEvent = useMemo(
@@ -58,6 +77,11 @@ function Home() {
     // Change page
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+    const handleApiCallSuccess = () => {
+        setApiCallSuccessful((prevApiCallSuccessful) => !prevApiCallSuccessful); // Set apiCallSuccessful to trigger re-render
+        setModalConfirmShow(false); // Close the ModalConfirm component
+    };
+
     return (
         <>
             <div className="container-fluid text-center mx-n2">
@@ -65,10 +89,11 @@ function Home() {
                     {currentEvent.length > 0 ? (
                         currentEvent.map((data) => (
                             <ViolationCard
-                                key={data['id']}
+                                key={data['messageid']}
                                 data={data}
-                                setModalShow={handleModalShow}
-                                handleCardClick={handleCardClick}
+                                handleModalVideoToggle={handleModalVideoToggle}
+                                handleModalConfirmToggle={handleModalConfirmToggle}
+                                handlePassButtonRef={handlePassButtonRef}
                                 loading={loading}
                             />
                         ))
@@ -91,11 +116,21 @@ function Home() {
                 paginate={paginate}
                 currentPage={currentPage}
             />
-            {selectedVideoId && (
+            {selectedEvent && (
                 <ModalVideo
-                    show={modalShow}
-                    onHide={handleModalHide}
-                    videoData={selectedVideoData} // Pass the selected video data as the videoData prop
+                    show={modalVideoShow}
+                    onHide={handleModalVideoToggle}
+                    data={selectedEvent} // Pass the selected video data as the videoData prop
+                    handleModalConfirmToggle={handleModalConfirmToggle}
+                />
+            )}
+            {selectedEvent && modalConfirmShow && (
+                <ModalConfirm
+                    show={modalConfirmShow}
+                    onHide={handleModalConfirmToggle}
+                    data={selectedEvent}
+                    eventChoice={eventChoice}
+                    onApiCallSuccess={handleApiCallSuccess} // Pass the handleApiCallSuccess function
                 />
             )}
         </>
