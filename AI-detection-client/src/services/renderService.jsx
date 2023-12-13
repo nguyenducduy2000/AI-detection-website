@@ -1,21 +1,43 @@
 import httpRequest from '~/utils/httpRequest';
 
 export default {
-    render: (limit) => {
+    render: () => {
         const options = {
             method: 'GET',
             url: '/',
         };
-        if (limit) {
-            options.params = {
-                limit,
-            };
-        }
+        // if (filterData) {
+        //     options.params = {
+        //         ...options.params,
+        //         ...filterData,
+        //     };
+        // }
         return httpRequest(options)
             .then((res) => {
                 const data = res.data;
-                const limitedData = data.slice(0, limit);
-                return limitedData;
+                return data;
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    },
+
+    filter: ({ objectType, timeFrom, timeTo, sensorID }) => {
+        console.log('filter API is being called');
+        const options = {
+            method: 'GET',
+            url: '/filter',
+            params: {
+                objectType,
+                timeFrom,
+                timeTo,
+                sensorID,
+            },
+        };
+        return httpRequest(options)
+            .then((res) => {
+                const data = res.data;
+                return data;
             })
             .catch((err) => {
                 console.log(err);

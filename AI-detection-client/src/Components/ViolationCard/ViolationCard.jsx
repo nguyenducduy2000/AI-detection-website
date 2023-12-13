@@ -49,7 +49,7 @@ function ViolationCard({ data, handleModalVideoToggle, handleModalConfirmToggle,
                             <text className="fw-bold">Sensor_id:</text> {data.sensor_id}
                         </div>
                         <div className="card-text">
-                            <text className="fw-bold">Detection type:</text> {data.object_id}{' '}
+                            <text className="fw-bold">object type:</text> {data.object_id}{' '}
                         </div>
                         <div className="card-text">
                             <text className="fw-bold">Status:</text>{' '}

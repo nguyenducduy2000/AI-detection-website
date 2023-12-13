@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useContext } from 'react';
 import Spinner from 'react-bootstrap/Spinner';
 
 import ModalVideo from '~/Components/ModalVideo';
@@ -6,8 +6,12 @@ import ModalConfirm from '~/Components/ModalConfirm';
 import ViolationCard from '~/Components/ViolationCard/ViolationCard';
 import PaginationPage from '~/Components/PaginationPage';
 import renderService from '~/services/renderService';
+import { FilterContext } from '~/Components/FilterContext';
 
 function Home() {
+    // Get context from FilterContext
+    const { filterParams } = useContext(FilterContext);
+
     // ModalVideo setting
     const [modalVideoShow, setModalVideoShow] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
@@ -59,13 +63,19 @@ function Home() {
     useEffect(() => {
         const axiosFetchEvents = async () => {
             setLoading(true);
-            const response = await renderService.render();
-            setEvents(response);
+            console.log(filterParams);
+            if (window.location.href.includes('/filter')) {
+                const response = await renderService.filter(filterParams);
+                setEvents(response);
+            } else {
+                const response = await renderService.render();
+                setEvents(response);
+            }
             setLoading(false);
         };
 
         axiosFetchEvents();
-    }, [apiCallSuccessful]);
+    }, [apiCallSuccessful, filterParams]);
 
     // Get current events when change page
     const indexOfLastEvent = currentPage * eventsPerPage;

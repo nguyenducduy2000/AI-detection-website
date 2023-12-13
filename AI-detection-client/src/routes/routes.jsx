@@ -7,6 +7,7 @@ import Chart from '~/Pages/Chart';
 // Public routes
 const publicRoutes = [
     { path: config.routes.home, component: Home },
+    { path: config.routes.filter, component: Home },
     { path: config.routes.chart, component: Chart },
 ];
 

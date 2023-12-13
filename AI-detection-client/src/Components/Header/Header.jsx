@@ -21,6 +21,10 @@ function Header() {
     // Toggle button settings
     const [checked, setChecked] = useState(true);
 
+    const handleFilterSubmit = () => {
+        setOpen((prevOpen) => !prevOpen);
+    };
+
     useEffect(() => {
         if (activeLink === 'home') {
             homeLink.current.classList.add('active');
@@ -112,7 +116,7 @@ function Header() {
             <div ref={filterItemRef}>
                 <Collapse in={open}>
                     <div id="nav-collapse-filter">
-                        <Filter />
+                        <Filter onFilterSubmit={handleFilterSubmit} />
                     </div>
                 </Collapse>
             </div>
