@@ -20,7 +20,7 @@ function Home() {
     // ModalConfirm setting
     const [modalConfirmShow, setModalConfirmShow] = useState(false);
     const [eventChoice, setEventChoice] = useState();
-    const [apiCallSuccessful, setApiCallSuccessful] = useState(false); // Track API call success
+    const [confirmSuccessful, setConfirmSuccessful] = useState(false); // Track API call on confirm modal success
     const handlePassButtonRef = useCallback((BtnRef) => {
         // console.log(BtnRef);
         setEventChoice(BtnRef);
@@ -75,7 +75,7 @@ function Home() {
         };
 
         axiosFetchEvents();
-    }, [apiCallSuccessful, filterParams]);
+    }, [filterParams, confirmSuccessful]);
 
     // Get current events when change page
     const indexOfLastEvent = currentPage * eventsPerPage;
@@ -87,10 +87,11 @@ function Home() {
     // Change page
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-    const handleApiCallSuccess = () => {
-        setApiCallSuccessful((prevApiCallSuccessful) => !prevApiCallSuccessful); // Set apiCallSuccessful to trigger re-render
+    const handleApiCallSuccess = useCallback(() => {
+        // console.log('trigger ApiCallSuccess successful');
+        setConfirmSuccessful((prevApiCallSuccessful) => !prevApiCallSuccessful); // Set confirmSuccessful to trigger re-render
         setModalConfirmShow(false); // Close the ModalConfirm component
-    };
+    }, []);
 
     return (
         <>

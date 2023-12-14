@@ -94,7 +94,7 @@ class SiteController {
             res.status(500).send({ error: 'Internal Server Error' });
         } finally {
             try {
-                conn.release();
+                await conn.release();
             } catch (err) {
                 console.error(err);
             }
@@ -105,15 +105,14 @@ class SiteController {
     async accept(req, res, next) {
         const conn = await getConnect();
         try {
-            console.log(req.body.id);
             const result = await conn.query(`UPDATE message SET status = 1 WHERE messageid = ?`, [req.body.id]);
+            res.send({ success: true });
         } catch (err) {
             console.error(err);
-            res.status(500).send({ error: 'Internal Server Error' });
+            res.status(400).send({ error: 'Error updating message status' });
         } finally {
             try {
-                // await pool.end();
-                conn.release();
+                await conn.release();
             } catch (err) {
                 console.error(err);
             }
@@ -125,13 +124,13 @@ class SiteController {
         const conn = await getConnect();
         try {
             const result = await conn.query(`UPDATE message SET status = 0 WHERE messageid = ?`, [req.body.id]);
+            res.send({ success: true });
         } catch (err) {
             console.error(err);
-            res.status(500).send({ error: 'Internal Server Error' });
+            res.status(400).send({ error: 'Error updating message status' });
         } finally {
             try {
-                // await pool.end();
-                conn.release();
+                await conn.release();
             } catch (err) {
                 console.error(err);
             }

@@ -58,9 +58,9 @@ function Filter({ onFilterSubmit }) {
                     onChange={(event) => setObjectType(event.target.value)}
                 >
                     <option value={null}>--- Loại tìm kiếm ---</option>
-                    <option value="type 1">Type 1</option>
-                    <option value="type 2">Type 2</option>
-                    <option value="type 3">Type 3</option>
+                    <option value="type_1">Type 1</option>
+                    <option value="type_2">Type 2</option>
+                    <option value="type_3">Type 3</option>
                 </Form.Select>
             </Form.Group>
 

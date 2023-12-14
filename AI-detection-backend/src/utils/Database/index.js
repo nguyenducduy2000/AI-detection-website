@@ -44,9 +44,9 @@ const getConnect = async () => {
     return await pool.getConnection();
 };
 
-// function getRandomInt(min, max) {
-//     return Math.floor(Math.random() * (max - min + 1)) + min;
-// }
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
 
 // const test = async () => {
 //     const conn = await getConnect();
@@ -56,8 +56,8 @@ const getConnect = async () => {
 //             const messageId = `message_${i}`;
 //             const timestamp = getRandomDate();
 //             const placeId = i;
-//             const sensorId = i;
-//             const objectId = `type ${getRandomInt(1, 3)}`;
+//             const sensorId = getRandomInt(1, 3);
+//             const objectId = `type_${getRandomInt(1, 3)}`;
 //             const eventId = `event_${i}`;
 //             const imageURL = `https://storage.googleapis.com/web-backend-test/images/img_${i}.jpg`;
 //             const videoURL = `https://storage.googleapis.com/web-backend-test/videos/video_${i}.mp4`;

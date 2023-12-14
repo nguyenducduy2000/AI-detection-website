@@ -23,7 +23,7 @@ export default {
     },
 
     filter: ({ objectType, timeFrom, timeTo, sensorID }) => {
-        console.log('filter API is being called');
+        // console.log('filter API is being called');
         const options = {
             method: 'GET',
             url: '/filter',

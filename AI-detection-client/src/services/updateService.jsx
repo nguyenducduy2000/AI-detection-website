@@ -12,7 +12,7 @@ export default {
         return httpRequest(options)
             .then((res) => {
                 console.log(res.data);
-                res.send(res.data);
+                // res.send(res.data);
             })
             .catch((err) => {
                 console.log(err);
@@ -29,7 +29,7 @@ export default {
         return httpRequest(options)
             .then((res) => {
                 console.log(res.data);
-                res.send(res.data);
+                // res.send(res.data);
             })
             .catch((err) => {
                 console.log(err);

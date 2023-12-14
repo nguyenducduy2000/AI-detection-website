@@ -28,31 +28,26 @@ function ModalConfirm({ show, onHide, data, eventChoice, onApiCallSuccess, ...pa
     };
 
     const handleConfirm = () => {
-        // console.log(eventChoice);
         if (eventChoice && eventChoice.classList.contains('accept-btn')) {
-            // handle accept
             console.log('accept');
             updateService
                 .accept(data.messageid)
                 .then(() => {
-                    // API call succeeded, trigger re-render
+                    // console.log('trigger ApiCallSuccess');
                     onApiCallSuccess();
                 })
                 .catch((error) => {
-                    // Handle API call error
                     console.error(error);
                 });
         } else if (eventChoice && eventChoice.classList.contains('reject-btn')) {
-            // handle reject
             console.log('reject');
             updateService
                 .reject(data.messageid)
                 .then(() => {
-                    // API call succeeded, trigger re-render
+                    // console.log('trigger ApiCallSuccess');
                     onApiCallSuccess();
                 })
                 .catch((error) => {
-                    // Handle API call error
                     console.error(error);
                 });
         }
