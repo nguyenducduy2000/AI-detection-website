@@ -3,26 +3,33 @@ import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import Collapse from 'react-bootstrap/Collapse';
 import ToggleButton from 'react-bootstrap/ToggleButton';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from 'react-bootstrap';
 import { useState, useRef, useEffect } from 'react';
 import clsx from 'clsx';
-
 import Filter from '~Components/Filter';
 import config from '~/config';
+import { useStore } from '~/store';
 
 function Header() {
     const [activeLink, setActiveLink] = useState('home');
-    const [open, setOpen] = useState(false);
     const homeLink = useRef(null);
     const chartLink = useRef(null);
     const filterItemRef = useRef(null);
 
-    // Toggle button settings
-    const [checked, setChecked] = useState(true);
+    // Realtime button state
+    const { isActivate, setIsActivate, openFilter, setOpenFilter } = useStore();
+    const navigate = useNavigate();
 
     const handleFilterSubmit = () => {
-        setOpen((prevOpen) => !prevOpen);
+        setOpenFilter((prevOpen) => !prevOpen);
+    };
+
+    const handleRealtimeToggle = (e) => {
+        setIsActivate(e.currentTarget.checked);
+        if (e.currentTarget.checked) {
+            navigate('/');
+        }
     };
 
     useEffect(() => {
@@ -47,7 +54,13 @@ function Header() {
         }, 150);
 
         return () => clearTimeout(handleScrollIntoView);
-    }, [open]);
+    }, [openFilter]);
+
+    useEffect(() => {
+        if (isActivate) {
+            setOpenFilter(false);
+        }
+    }, [isActivate, setOpenFilter]);
 
     return (
         <>
@@ -64,7 +77,7 @@ function Header() {
                                     to={config.routes.home}
                                     onClick={() => {
                                         setActiveLink('home');
-                                        setOpen(false);
+                                        setOpenFilter(false);
                                     }}
                                 >
                                     Home
@@ -77,7 +90,7 @@ function Header() {
                                     to={config.routes.chart}
                                     onClick={() => {
                                         setActiveLink('link');
-                                        setOpen(false);
+                                        setOpenFilter(false);
                                     }}
                                 >
                                     Chart
@@ -86,10 +99,10 @@ function Header() {
                             <Nav.Item>
                                 <Button
                                     onClick={() => {
-                                        setOpen(!open);
+                                        setOpenFilter(!openFilter);
                                     }}
                                     aria-controls="example-collapse-text"
-                                    aria-expanded={open}
+                                    aria-expanded={openFilter}
                                 >
                                     Filter
                                 </Button>
@@ -100,11 +113,11 @@ function Header() {
                                     id="toggle-check"
                                     type="checkbox"
                                     variant="outline-success"
-                                    checked={checked}
+                                    checked={isActivate}
                                     value="1"
-                                    onChange={(e) => setChecked(e.currentTarget.checked)}
+                                    onChange={handleRealtimeToggle}
                                 >
-                                    Realtime: {checked ? 'ON' : 'OFF'}
+                                    Realtime: {isActivate ? 'ON' : 'OFF'}
                                 </ToggleButton>
                             </Nav.Item>
                         </Nav>
@@ -114,7 +127,7 @@ function Header() {
 
             {/* The div is used to mount ref onto the collapse component */}
             <div ref={filterItemRef}>
-                <Collapse in={open}>
+                <Collapse in={openFilter}>
                     <div id="nav-collapse-filter">
                         <Filter onFilterSubmit={handleFilterSubmit} />
                     </div>

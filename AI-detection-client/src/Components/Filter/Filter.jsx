@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useState, useContext } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import Button from 'react-bootstrap/Button';
@@ -7,7 +7,7 @@ import Form from 'react-bootstrap/Form';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 // import renderService from '~/services/renderService';
-import { FilterContext } from '~Components/FilterContext';
+import { useStore } from '~/store';
 
 function Filter({ onFilterSubmit }) {
     const navigate = useNavigate();
@@ -17,8 +17,8 @@ function Filter({ onFilterSubmit }) {
     //     paramTimeTo = valueTo,
     //     paramSensorID = sensorID,
     // } = useParams();
-    // Get context from FilterContext
-    const { setFilterParams } = useContext(FilterContext);
+    // Get context from StoreContext
+    const { setIsActivate, setFilterParams } = useStore();
 
     // Calendar setting
     const [valueFrom, setValueFrom] = useState(null);
@@ -35,13 +35,23 @@ function Filter({ onFilterSubmit }) {
         // Set the time in the To calendar to the end of the day
         const endOfDayTo = valueTo ? new Date(valueTo.setHours(23, 59, 59, 999)) : null;
         const formattedValueTo = endOfDayTo ? endOfDayTo.toISOString() : null;
+
+        // Check if objectType and sensorID are empty strings and set them to null
+        if (objectType === '') {
+            setObjectType(null);
+        }
+        if (sensorID === '') {
+            setSensorID(null);
+        }
+
         const filterData = {
             objectType,
             timeFrom: formattedValueFrom,
             timeTo: formattedValueTo,
-            // parse into int(number)
             sensorID,
         };
+        console.log(filterData);
+        setIsActivate(false);
         navigate(`/filter/${objectType}/${formattedValueFrom}/${formattedValueTo}/${sensorID}`);
         setFilterParams(filterData);
         onFilterSubmit();
@@ -54,10 +64,10 @@ function Filter({ onFilterSubmit }) {
                 <Form.Select
                     name="objectType"
                     aria-label="Default select example"
-                    value={objectType}
-                    onChange={(event) => setObjectType(event.target.value)}
+                    value={objectType || ''}
+                    onChange={(event) => setObjectType(event.target.value || null)}
                 >
-                    <option value={null}>--- Loại tìm kiếm ---</option>
+                    <option value="">All</option>
                     <option value="type_1">Type 1</option>
                     <option value="type_2">Type 2</option>
                     <option value="type_3">Type 3</option>
@@ -109,12 +119,12 @@ function Filter({ onFilterSubmit }) {
             <Form.Group
                 className="m-3"
                 controlId="formBasicCheckbox"
-                value={sensorID}
-                onChange={(event) => setSensorID(event.target.value)}
+                value={sensorID || ''}
+                onChange={(event) => setSensorID(event.target.value || null)}
             >
                 <Form.Label>Sensor ID</Form.Label>
                 <Form.Select name="sensorID" aria-label="Default select example">
-                    <option value={null}>--- Loại tìm kiếm ---</option>
+                    <option value="">All</option>
                     <option value="1">Sensor 1</option>
                     <option value="2">Sensor 2</option>
                     <option value="3">Sensor 3</option>

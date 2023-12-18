@@ -36,23 +36,23 @@ function ViolationCard({ data, handleModalVideoToggle, handleModalConfirmToggle,
                 <div className="card-body">
                     <h5 className="card-title">{data.messageid}</h5>
                     <div className="d-flex flex-column justify-content-between align-items-center">
-                        <div className="card-text">
-                            <text className="fw-bold">Locaion_id:</text> {data.place_id}
+                        <div className="card-span">
+                            <span className="fw-bold">Locaion_id:</span> {data.place_id}
                         </div>
-                        <div className="card-text">
-                            <text className="fw-bold">Event type:</text> {data.event_id}
+                        <div className="card-span">
+                            <span className="fw-bold">Event type:</span> {data.event_id}
                         </div>
-                        <div className={clsx('card-text', 'card-timestamp')}>
-                            <text className="fw-bold">Timestamp:</text> {data.timestamp}
+                        <div className={clsx('card-span', 'card-timestamp')}>
+                            <span className="fw-bold">Timestamp:</span> {data.timestamp}
                         </div>
-                        <div className="card-text">
-                            <text className="fw-bold">Sensor_id:</text> {data.sensor_id}
+                        <div className="card-span">
+                            <span className="fw-bold">Sensor_id:</span> {data.sensor_id}
                         </div>
-                        <div className="card-text">
-                            <text className="fw-bold">object type:</text> {data.object_id}{' '}
+                        <div className="card-span">
+                            <span className="fw-bold">object type:</span> {data.object_id}{' '}
                         </div>
-                        <div className="card-text">
-                            <text className="fw-bold">Status:</text>{' '}
+                        <div className="card-span">
+                            <span className="fw-bold">Status:</span>{' '}
                             {data.status === null ? 'Not checked' : data.status ? 'Approved' : 'Rejected'}
                         </div>
                     </div>

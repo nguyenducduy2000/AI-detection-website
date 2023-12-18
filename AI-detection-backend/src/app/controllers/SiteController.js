@@ -38,6 +38,42 @@ class SiteController {
         }
     }
 
+    // GET /
+    async fiveMinuteRender(req, res, next) {
+        const conn = await getConnect();
+        try {
+            console.log('call API to get 5 minutes ago events');
+
+            // Get the timestamp of 5 minutes ago
+            const fiveMinutesAgo = new Date();
+            fiveMinutesAgo.setMinutes(fiveMinutesAgo.getMinutes() - 5);
+
+            const result = await conn.query(`SELECT * FROM message WHERE timestamp >= ?`, [fiveMinutesAgo]);
+            const data = result[0].map((row) => ({
+                messageid: row.messageid,
+                timestamp: row.timestamp,
+                place_id: row.place_id,
+                sensor_id: row.sensor_id,
+                object_id: row.object_id,
+                event_id: row.event_id,
+                imageURL: row.imageURL,
+                videoURL: row.videoURL,
+                status: row.status,
+            }));
+            const jsonString = JSON.stringify(data);
+            res.send(jsonString);
+        } catch (err) {
+            console.error(err);
+            res.status(500).send({ error: 'Internal Server Error' });
+        } finally {
+            try {
+                conn.release();
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    }
+
     // GET /filter
     async filter(req, res, next) {
         const conn = await getConnect();

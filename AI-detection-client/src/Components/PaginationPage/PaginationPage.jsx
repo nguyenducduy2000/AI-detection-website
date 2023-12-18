@@ -22,9 +22,13 @@ function PaginationPage({ eventsPerPage, totalEvents, paginate, currentPage }) {
         if (pageNumbers.length <= 10) {
             pageNumbers.forEach((number) => {
                 items.push(
-                    <Link key={number} onClick={() => paginateHandler(number)}>
-                        <Pagination.Item active={number === currentPage}>{number}</Pagination.Item>
-                    </Link>,
+                    <Pagination.Item
+                        key={number}
+                        onClick={() => paginateHandler(number)}
+                        active={number === currentPage}
+                    >
+                        {number}
+                    </Pagination.Item>,
                 );
             });
         } else {
