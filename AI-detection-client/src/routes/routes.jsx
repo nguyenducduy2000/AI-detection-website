@@ -9,6 +9,7 @@ const publicRoutes = [
     { path: config.routes.home, component: Home },
     { path: config.routes.filter, component: Home },
     { path: config.routes.chart, component: Chart },
+    { path: config.routes.chartFilter, component: Chart },
 ];
 
 // Private routes

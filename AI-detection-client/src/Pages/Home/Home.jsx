@@ -139,7 +139,12 @@ function Home() {
                                             <span className="visually-hidden">Loading...</span>
                                         </Spinner>
                                     ) : (
-                                        <p>No data available, please check your internet connection</p>
+                                        <div
+                                            className="d-flex flex-fill flex-column justify-content-center align-items-center my-4"
+                                            style={{ height: '69vh' }}
+                                        >
+                                            <h3>No data available, please check your internet connection</h3>
+                                        </div>
                                     )}
                                 </div>
                             )}
@@ -170,11 +175,15 @@ function Home() {
                     )}
                 </>
             ) : (
-                <div className="d-flex flex-fill flex-column justify-content-center align-items-center my-4">
-                    <p>Realtime option is currently off </p>
-                    <p>
-                        To see the Event data, please turn turn Realtime option on or use{' '}
+                <div
+                    className="d-flex flex-fill flex-column justify-content-center align-items-center my-4"
+                    style={{ height: '80vh' }}
+                >
+                    <h2 className="mb-5">Realtime option is currently off </h2>
+                    <h2>
+                        To see the Event data, please turn on Realtime option on or use{' '}
                         <Button
+                            className="btn-lg"
                             onClick={() => {
                                 setOpenFilter(!openFilter);
                             }}
@@ -183,7 +192,7 @@ function Home() {
                         >
                             Filter
                         </Button>
-                    </p>
+                    </h2>
                 </div>
             )}
         </>

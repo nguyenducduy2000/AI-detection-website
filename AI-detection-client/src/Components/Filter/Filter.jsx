@@ -6,17 +6,10 @@ import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
-// import renderService from '~/services/renderService';
 import { useStore } from '~/store';
 
 function Filter({ onFilterSubmit }) {
     const navigate = useNavigate();
-    // const {
-    //     paramObjectType = objectType,
-    //     paramTimeFrom = valueFrom,
-    //     paramTimeTo = valueTo,
-    //     paramSensorID = sensorID,
-    // } = useParams();
     // Get context from StoreContext
     const { setIsActivate, setFilterParams } = useStore();
 
@@ -25,6 +18,7 @@ function Filter({ onFilterSubmit }) {
     const [valueTo, setValueTo] = useState(null);
     const [objectType, setObjectType] = useState(null);
     const [sensorID, setSensorID] = useState(null);
+    const [status, setStatus] = useState('all');
     const handleSubmit = (event) => {
         event.preventDefault();
 
@@ -49,16 +43,23 @@ function Filter({ onFilterSubmit }) {
             timeFrom: formattedValueFrom,
             timeTo: formattedValueTo,
             sensorID,
+            status,
         };
         console.log(filterData);
         setIsActivate(false);
-        navigate(`/filter/${objectType}/${formattedValueFrom}/${formattedValueTo}/${sensorID}`);
+        // Check the current URL and navigate accordingly
+        const currentUrl = window.location.pathname;
+        if (currentUrl.includes('/chart')) {
+            navigate(`/chart/filter/${objectType}/${formattedValueFrom}/${formattedValueTo}/${sensorID}/${status}`);
+        } else {
+            navigate(`/filter/${objectType}/${formattedValueFrom}/${formattedValueTo}/${sensorID}/${status}`);
+        }
         setFilterParams(filterData);
         onFilterSubmit();
     };
 
     return (
-        <Form onSubmit={handleSubmit} method="GET" action="/filter">
+        <Form className="mb-3" onSubmit={handleSubmit} method="GET" action="/filter">
             <Form.Group className="m-3">
                 <Form.Label>Object type</Form.Label>
                 <Form.Select
@@ -128,6 +129,21 @@ function Filter({ onFilterSubmit }) {
                     <option value="1">Sensor 1</option>
                     <option value="2">Sensor 2</option>
                     <option value="3">Sensor 3</option>
+                </Form.Select>
+            </Form.Group>
+
+            <Form.Group
+                className="m-3"
+                controlId="formBasicCheckbox"
+                value={status || 'all'}
+                onChange={(event) => setStatus(event.target.value || 'all')}
+            >
+                <Form.Label>Status</Form.Label>
+                <Form.Select name="status" aria-label="Default select example">
+                    <option value="all">All</option>
+                    <option value="1">Approved</option>
+                    <option value="0">Rejected</option>
+                    <option value="null">Not Checked</option>
                 </Form.Select>
             </Form.Group>
 

@@ -12,7 +12,13 @@ import config from '~/config';
 import { useStore } from '~/store';
 
 function Header() {
-    const [activeLink, setActiveLink] = useState('home');
+    const [activeLink, setActiveLink] = useState(() => {
+        if (window.location.pathname === '/') {
+            return 'home';
+        } else if (window.location.pathname.includes('/chart')) {
+            return 'chart';
+        }
+    });
     const homeLink = useRef(null);
     const chartLink = useRef(null);
     const filterItemRef = useRef(null);
@@ -33,12 +39,13 @@ function Header() {
     };
 
     useEffect(() => {
-        if (activeLink === 'home') {
-            homeLink.current.classList.add('active');
-            chartLink.current.classList.remove('active');
-        } else if (activeLink === 'link') {
+        const currentUrl = window.location.pathname;
+        if (currentUrl.includes('/chart')) {
             homeLink.current.classList.remove('active');
             chartLink.current.classList.add('active');
+        } else {
+            homeLink.current.classList.add('active');
+            chartLink.current.classList.remove('active');
         }
     }, [activeLink]);
 

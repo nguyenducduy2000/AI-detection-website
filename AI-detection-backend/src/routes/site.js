@@ -5,7 +5,7 @@ var router = express.Router();
 
 const siteController = require('../app/controllers/SiteController');
 
-router.get('/', siteController.fiveMinuteRender);
+router.get('/', siteController.realtimeRender);
 router.get('/filter', siteController.filter);
 router.put('/accept', siteController.accept);
 router.put('/reject', siteController.reject);

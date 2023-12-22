@@ -4,7 +4,7 @@ export default {
     render: () => {
         const options = {
             method: 'GET',
-            url: '/',
+            url: '/chart',
         };
         // if (filterData) {
         //     options.params = {
@@ -22,17 +22,16 @@ export default {
             });
     },
 
-    filter: ({ objectType, timeFrom, timeTo, sensorID, status }) => {
+    chartFilter: ({ objectType, timeFrom, timeTo, sensorID }) => {
         // console.log('filter API is being called');
         const options = {
             method: 'GET',
-            url: '/filter',
+            url: '/chart/filter',
             params: {
                 objectType,
                 timeFrom,
                 timeTo,
                 sensorID,
-                status,
             },
         };
         return httpRequest(options)
