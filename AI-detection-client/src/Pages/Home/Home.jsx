@@ -37,6 +37,7 @@ function Home() {
     // ModalVideo setting
     const [modalVideoShow, setModalVideoShow] = useState(false);
     const [selectedEvent, setSelectedEvent] = useState(null);
+    const [eventInfo, setEventInfo] = useState({});
     const [events, setEvents] = useState([]);
 
     // ModalConfirm setting
@@ -54,16 +55,20 @@ function Home() {
     const [eventsPerPage] = useState(10);
 
     const handleCardClick = useCallback(
-        (id) => {
-            const thisData = events.find((data) => data['messageid'] === id);
+        async (id) => {
+            const thisData = events.find((data) => data['messageId'] === id);
             setSelectedEvent(thisData);
+            const res = await renderService.getEventInfo(id);
+            setEventInfo(res);
         },
         [events],
     );
     const handleModalVideoToggle = useCallback(
         (videoId) => {
+            setLoading(true);
             setModalVideoShow((prevModalShow) => !prevModalShow);
             handleCardClick(videoId);
+            setLoading(false);
         },
         [handleCardClick],
     );
@@ -124,7 +129,7 @@ function Home() {
                             {currentEvent.length > 0 ? (
                                 currentEvent.map((data) => (
                                     <ViolationCard
-                                        key={data['messageid']}
+                                        key={data['messageId']}
                                         data={data}
                                         handleModalVideoToggle={handleModalVideoToggle}
                                         handleModalConfirmToggle={handleModalConfirmToggle}
@@ -158,9 +163,11 @@ function Home() {
                     />
                     {selectedEvent && (
                         <ModalVideo
+                            loading={loading}
                             show={modalVideoShow}
                             onHide={handleModalVideoToggle}
                             data={selectedEvent} // Pass the selected video data as the videoData prop
+                            eventInfo={eventInfo}
                             handleModalConfirmToggle={handleModalConfirmToggle}
                         />
                     )}

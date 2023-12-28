@@ -22,6 +22,24 @@ export default {
             });
     },
 
+    getEventInfo: (messageId) => {
+        const options = {
+            method: 'GET',
+            url: '/event',
+            params: {
+                messageId,
+            },
+        };
+        return httpRequest(options)
+            .then((res) => {
+                const data = res.data;
+                return data;
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    },
+
     filter: ({ objectType, timeFrom, timeTo, sensorID, status }) => {
         // console.log('filter API is being called');
         const options = {

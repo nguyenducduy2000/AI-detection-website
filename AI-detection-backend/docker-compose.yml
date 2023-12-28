@@ -1,0 +1,41 @@
+version: 0.0.1
+
+services:
+    db:
+        image: mysql:8.0
+        # command: --default-authentication-plugin=mysql_native_password
+        # container_name: mysql
+        restart: always
+        environment:
+            MYSQL_HOST: localhost
+            MYSQL_DATABASE: mydb
+            MYSQL_USER: mysql
+            MYSQL_PASSWORD: 1234
+            MYSQL_ROOT_PASSWORD: root
+        ports:
+            - 3306:3306
+        volumes:
+            - ./mysql-db:/var/lib/mysql
+
+    # rabbitmq:
+    #     image: rabbitmq:management
+    #     container_name: rabbitmq
+    #     environment:
+    #         - RABBITMQ_DEFAULT_USER=root
+    #         - RABBITMQ_DEFAULT_PASS=root
+    #     ports:
+    #         - 5672:5672
+    #         - 15672:15672
+
+    # ai-backend:
+    #     build: .
+    #     container_name: ai-backend
+    #     ports:
+    #         - 4000:4000
+    #     depends_on:
+    #         - db
+    #         - rabbitmq
+
+networks:
+    default:
+        driver: bridge

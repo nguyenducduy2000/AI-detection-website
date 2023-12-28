@@ -13,12 +13,12 @@ function ViolationCard({ data, handleModalVideoToggle, handleModalConfirmToggle,
     }
 
     const handleWatchVideo = () => {
-        handleModalVideoToggle(data.messageid);
+        handleModalVideoToggle(data.messageId);
     };
 
     const handleToggleModalConfirm = (btnRef) => {
         // console.log(btnRef.current);
-        handleModalConfirmToggle(data.messageid);
+        handleModalConfirmToggle(data.messageId);
         handlePassButtonRef(btnRef.current);
     };
 
@@ -30,26 +30,32 @@ function ViolationCard({ data, handleModalVideoToggle, handleModalConfirmToggle,
                     className="card-img-top"
                     alt="..."
                     onClick={() => {
-                        handleWatchVideo(data.messageid);
+                        handleWatchVideo(data.messageId);
                     }}
                 />
                 <div className="card-body">
-                    <h5 className="card-title">{data.messageid}</h5>
+                    <h5 className="card-title">{data.messageId}</h5>
                     <div className="d-flex flex-column justify-content-between align-items-center">
-                        <div className="card-span">
-                            <span className="fw-bold">Locaion_id:</span> {data.place_id}
-                        </div>
-                        <div className="card-span">
-                            <span className="fw-bold">Event type:</span> {data.event_id}
-                        </div>
                         <div className={clsx('card-span', 'card-timestamp')}>
                             <span className="fw-bold">Timestamp:</span> {data.timestamp}
                         </div>
                         <div className="card-span">
-                            <span className="fw-bold">Sensor_id:</span> {data.sensor_id}
+                            <span className="fw-bold">Locaion_id:</span> {data.location_id}
                         </div>
                         <div className="card-span">
-                            <span className="fw-bold">object type:</span> {data.object_id}{' '}
+                            <span className="fw-bold">Model:</span> {data.modelDescription}
+                        </div>
+                        <div className="card-span">
+                            <span className="fw-bold">Camera:</span> {data.cameraDescription}
+                        </div>
+                        <div className="card-span">
+                            <span className="fw-bold">Camara type:</span> {data.cameraType}
+                        </div>
+                        <div className="card-span">
+                            <span className="fw-bold">Number of Objects:</span> {data.numberOfObjects}
+                        </div>
+                        <div className="card-span">
+                            <span className="fw-bold">Number of Events:</span> {data.numberOfEvents}
                         </div>
                         <div className="card-span">
                             <span className="fw-bold">Status:</span>{' '}
@@ -63,7 +69,7 @@ function ViolationCard({ data, handleModalVideoToggle, handleModalConfirmToggle,
                             className="btn btn-primary"
                             type="button"
                             onClick={() => {
-                                handleModalVideoToggle(data.messageid);
+                                handleModalVideoToggle(data.messageId);
                             }}
                         >
                             Watch video

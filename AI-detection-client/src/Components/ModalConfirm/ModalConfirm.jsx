@@ -21,9 +21,9 @@ function ModalConfirm({ show, onHide, data, eventChoice, onApiCallSuccess, ...pa
     const getMessage = () => {
         // console.log(eventChoice);
         if (eventChoice && eventChoice.classList.contains('accept-btn')) {
-            return `You are about to Accept ${data.messageid}. Do you want to continue?`;
+            return `You are about to Accept ${data.messageId}. Do you want to continue?`;
         } else if (eventChoice && eventChoice.classList.contains('reject-btn')) {
-            return `You are about to Reject ${data.messageid}. Do you want to continue?`;
+            return `You are about to Reject ${data.messageId}. Do you want to continue?`;
         }
     };
 
@@ -31,7 +31,7 @@ function ModalConfirm({ show, onHide, data, eventChoice, onApiCallSuccess, ...pa
         if (eventChoice && eventChoice.classList.contains('accept-btn')) {
             console.log('accept');
             updateService
-                .accept(data.messageid)
+                .accept(data.messageId)
                 .then(() => {
                     // console.log('trigger ApiCallSuccess');
                     onApiCallSuccess();
@@ -42,7 +42,7 @@ function ModalConfirm({ show, onHide, data, eventChoice, onApiCallSuccess, ...pa
         } else if (eventChoice && eventChoice.classList.contains('reject-btn')) {
             console.log('reject');
             updateService
-                .reject(data.messageid)
+                .reject(data.messageId)
                 .then(() => {
                     // console.log('trigger ApiCallSuccess');
                     onApiCallSuccess();
@@ -56,7 +56,7 @@ function ModalConfirm({ show, onHide, data, eventChoice, onApiCallSuccess, ...pa
     return (
         <Modal {...props} size="lg" aria-labelledby="contained-modal-title-vcenter" centered>
             <Modal.Header closeButton>
-                <Modal.Title id="contained-modal-title-vcenter">{data.messageid}</Modal.Title>
+                <Modal.Title id="contained-modal-title-vcenter">{data.messageId}</Modal.Title>
             </Modal.Header>
             <Modal.Body className="d-flex flex-fill">{getMessage()}</Modal.Body>
             <Modal.Footer className="d-flex flex-fill">

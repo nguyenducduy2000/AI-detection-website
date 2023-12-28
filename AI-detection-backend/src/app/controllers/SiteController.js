@@ -9,22 +9,30 @@ class SiteController {
         const conn = await getConnect();
         try {
             console.log('call API to /');
-            const result = await conn.query(`SELECT * FROM message;`);
+            const result =
+                await conn.query(`SELECT DISTINCT *, model.description AS model_description, camera.description AS camera_description 
+                                            FROM message                                
+                                            JOIN model ON message.model_id = model.model_id
+                                            JOIN camera ON message.camera_id = camera.camera_id`);
             const data = result[0].map((row) => ({
-                messageid: row.messageid,
+                messageId: row.message_id,
                 timestamp: row.timestamp,
-                place_id: row.place_id,
-                sensor_id: row.sensor_id,
-                object_id: row.object_id,
-                event_id: row.event_id,
-                imageURL: row.imageURL,
-                videoURL: row.videoURL,
+                locationId: row.location_id,
+                modelId: row.model_id,
+                cameraId: row.camera_id,
+                numberOfObjects: row.number_of_objects,
+                numberOfEvents: row.number_of_events,
                 status: row.status,
+                imageURL: row.image_URL,
+                videoURL: row.video_URL,
+                modelDescription: row.model_description,
+                cameraType: row.type,
+                cameraDescription: row.camera_description,
             }));
             // Convert JSON object to string
-            const jsonString = JSON.stringify(data);
+            // const jsonString = JSON.stringify(data);
             // console.log(jsonString);
-            res.send(jsonString);
+            res.send(data);
         } catch (err) {
             console.error(err);
             res.status(500).send({ error: 'Internal Server Error' });
@@ -48,17 +56,28 @@ class SiteController {
             const fiveMinutesAgo = new Date();
             fiveMinutesAgo.setMinutes(fiveMinutesAgo.getMinutes() - 5);
 
-            const result = await conn.query(`SELECT * FROM message WHERE timestamp >= ?`, [fiveMinutesAgo]);
+            const result = await conn.query(
+                `SELECT DISTINCT *, model.description AS model_description, camera.description AS camera_description 
+                FROM message                                
+                INNER JOIN model ON message.model_id = model.model_id
+                INNER JOIN camera ON message.camera_id = camera.camera_id 
+                WHERE timestamp >= ?`,
+                [fiveMinutesAgo],
+            );
             const data = result[0].map((row) => ({
-                messageid: row.messageid,
+                messageId: row.message_id,
                 timestamp: row.timestamp,
-                place_id: row.place_id,
-                sensor_id: row.sensor_id,
-                object_id: row.object_id,
-                event_id: row.event_id,
-                imageURL: row.imageURL,
-                videoURL: row.videoURL,
+                locationId: row.location_id,
+                modelId: row.model_id,
+                cameraId: row.camera_id,
+                numberOfObjects: row.number_of_objects,
+                numberOfEvents: row.number_of_events,
                 status: row.status,
+                imageURL: row.image_URL,
+                videoURL: row.video_URL,
+                modelDescription: row.model_description,
+                cameraType: row.type,
+                cameraDescription: row.camera_description,
             }));
             const jsonString = JSON.stringify(data);
             res.send(jsonString);
@@ -74,13 +93,59 @@ class SiteController {
         }
     }
 
+    // GET /event
+    async getEventInfo(req, res, next) {
+        const conn = await getConnect();
+        try {
+            console.log('call API to /event');
+            console.log(req.query);
+            const result = await conn.query(
+                `
+                SELECT *
+                FROM object
+                INNER JOIN event ON object.message_id = event.message_id
+                WHERE object.message_id = ?`,
+                [req.query.messageId],
+            );
+            const data = result[0].map((row) => ({
+                messageId: row.message_id,
+                objectID: row.object_id,
+                objectType: row.object_type,
+                gender: row.gender || null,
+                age: row.age || null,
+                vehicleType: row.vehicle_type || null,
+                vehicleBrand: row.vehicle_brand || null,
+                vehicleColor: row.vehicle_color || null,
+                vehicleLicence: row.vehicle_licence || null,
+                bbox_topleftx: row.bbox_topleftx,
+                bbox_toplefty: row.bbox_toplefty,
+                bbox_bottomrightx: row.bbox_bottomrightx,
+                bbox_bottomrighty: row.bbox_bottomrighty,
+                eventType: row.event_type,
+                action: row.action,
+            }));
+            // Convert JSON object to string
+            const jsonString = JSON.stringify(data);
+            // console.log(jsonString);
+            res.send(jsonString);
+        } catch (err) {
+            console.log(err);
+        } finally {
+            try {
+                conn.release();
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    }
+
     // GET /filter
     async filter(req, res, next) {
         const conn = await getConnect();
         try {
             console.log('call API to /filter');
             console.log(req.query);
-            console.log(typeof req.query.status);
+            // console.log(typeof req.query.status);
             let myQuery = 'SELECT * FROM message WHERE 1=1';
             const queryParams = [];
 

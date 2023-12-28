@@ -9,17 +9,25 @@ class ChartController {
         const conn = await getConnect();
         try {
             console.log('call API to /chart');
-            const result = await conn.query(`SELECT * FROM message;`);
+            const result =
+                await conn.query(`SELECT DISTINCT *, model.description AS model_description, camera.description AS camera_description 
+                                            FROM message                                
+                                            JOIN model ON message.model_id = model.model_id
+                                            JOIN camera ON message.camera_id = camera.camera_id`);
             const data = result[0].map((row) => ({
-                messageid: row.messageid,
+                messageId: row.message_id,
                 timestamp: row.timestamp,
-                place_id: row.place_id,
-                sensor_id: row.sensor_id,
-                object_id: row.object_id,
-                event_id: row.event_id,
-                imageURL: row.imageURL,
-                videoURL: row.videoURL,
+                locationId: row.location_id,
+                modelId: row.model_id,
+                cameraId: row.camera_id,
+                numberOfObjects: row.number_of_objects,
+                numberOfEvents: row.number_of_events,
                 status: row.status,
+                imageURL: row.image_URL,
+                videoURL: row.video_URL,
+                modelDescription: row.model_description,
+                cameraType: row.type,
+                cameraDescription: row.camera_description,
             }));
             // Convert JSON object to string
             const jsonString = JSON.stringify(data);

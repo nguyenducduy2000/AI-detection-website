@@ -14,9 +14,14 @@ dist-ssr
 *.local
 credentials
 /src/public
-cloudsql.txt
+*.txt
 test.js
 cloudsql-test.session.sql
+mysql-db
+/src/utils/rabbitMQ/Topic
+post.js
+producer.js
+receiveNoti.js
 
 # Editor directories and files
 .vscode/*

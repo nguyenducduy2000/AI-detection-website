@@ -6,6 +6,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const gcs = require('./utils/Storage');
 const getConnect = require('./utils/Database');
+const receiveMessage = require('./utils/rabbitMQ/consumer');
 
 const app = express();
 const port = 4000;
@@ -26,6 +27,9 @@ app.use(cors(corsOption));
 app.use(methodOverride('_method'));
 
 app.use(morgan('combined'));
+
+// Only open when ready to receive messages from amqp server
+// receiveMessage();
 
 // Routes init
 route(app);
