@@ -12,8 +12,8 @@ class SiteController {
             const result =
                 await conn.query(`SELECT DISTINCT *, model.description AS model_description, camera.description AS camera_description 
                                             FROM message                                
-                                            JOIN model ON message.model_id = model.model_id
-                                            JOIN camera ON message.camera_id = camera.camera_id`);
+                                            INNER JOIN model ON message.model_id = model.model_id
+                                            INNER JOIN camera ON message.camera_id = camera.camera_id`);
             const data = result[0].map((row) => ({
                 messageId: row.message_id,
                 timestamp: row.timestamp,
@@ -146,42 +146,40 @@ class SiteController {
             console.log('call API to /filter');
             console.log(req.query);
             // console.log(typeof req.query.status);
-            let myQuery = 'SELECT * FROM message WHERE 1=1';
+            let myQuery = `SELECT DISTINCT *, 
+                            model.description AS model_description, 
+                            camera.description AS camera_description 
+                            FROM message 
+                            INNER JOIN model ON message.model_id = model.model_id 
+                            INNER JOIN camera ON message.camera_id = camera.camera_id 
+                            WHERE 1=1`;
             const queryParams = [];
 
-            if (req.query.objectType) {
-                myQuery += ' AND object_id = ?';
-                queryParams.push(req.query.objectType);
+            if (req.query.eventType && req.query.eventType !== 'all') {
+                myQuery += ` AND EXISTS (SELECT * FROM event WHERE event.message_id = message.message_id AND event_type = ?)`;
+                queryParams.push(req.query.eventType);
             }
 
-            if (req.query.timeFrom) {
+            if (req.query.timeFrom && req.query.timeTo) {
                 const timeFrom = new Date(req.query.timeFrom).toISOString();
-                console.log('timeFrom: ', timeFrom);
-                myQuery += ' AND timestamp >= ?';
-                queryParams.push(timeFrom);
-            }
-
-            if (req.query.timeTo) {
                 const timeTo = new Date(req.query.timeTo).toISOString();
-                console.log('timeTo: ', timeTo);
-                myQuery += ' AND timestamp <= ?';
-                queryParams.push(timeTo);
+                myQuery += ` AND message.timestamp >= ? AND message.timestamp <= ?`;
+                queryParams.push(timeFrom, timeTo);
             }
 
-            if (req.query.sensorID) {
-                const sensorID = parseInt(req.query.sensorID, 10);
-                myQuery += ' AND sensor_id = ?';
-                queryParams.push(sensorID);
+            if (req.query.cameraID && req.query.cameraID !== 'all') {
+                myQuery += ` AND message.camera_id = ?`;
+                queryParams.push(req.query.cameraID);
             }
 
             if (req.query.status && req.query.status !== 'all') {
                 let status;
                 if (req.query.status === 'null') {
-                    myQuery += ' AND status IS NULL';
+                    myQuery += ` AND status IS NULL`;
                 } else {
                     status = parseInt(req.query.status, 10);
                     if (status === 0 || status === 1) {
-                        myQuery += ' AND status = ?';
+                        myQuery += ' AND message.status = ?';
                         queryParams.push(status);
                     }
                 }
@@ -189,20 +187,24 @@ class SiteController {
             // console.log(myQuery);
             const result = await conn.query(myQuery, queryParams);
             const data = result[0].map((row) => ({
-                messageid: row.messageid,
+                messageId: row.message_id,
                 timestamp: row.timestamp,
-                place_id: row.place_id,
-                sensor_id: row.sensor_id,
-                object_id: row.object_id,
-                event_id: row.event_id,
-                imageURL: row.imageURL,
-                videoURL: row.videoURL,
+                locationId: row.location_id,
+                modelId: row.model_id,
+                cameraId: row.camera_id,
+                numberOfObjects: row.number_of_objects,
+                numberOfEvents: row.number_of_events,
                 status: row.status,
+                imageURL: row.image_URL,
+                videoURL: row.video_URL,
+                modelDescription: row.model_description,
+                cameraType: row.type,
+                cameraDescription: row.camera_description,
             }));
             // console.log(data);
             // Convert JSON object to string
             const jsonString = JSON.stringify(data);
-            // console.log(jsonString);
+            // console.log(data);
             res.send(jsonString);
         } catch (err) {
             console.error(err);
@@ -220,7 +222,7 @@ class SiteController {
     async accept(req, res, next) {
         const conn = await getConnect();
         try {
-            const result = await conn.query(`UPDATE message SET status = 1 WHERE messageid = ?`, [req.body.id]);
+            const result = await conn.query(`UPDATE message SET status = 1 WHERE message_id = ?`, [req.body.id]);
             res.send({ success: true });
         } catch (err) {
             console.error(err);
@@ -238,7 +240,7 @@ class SiteController {
     async reject(req, res, next) {
         const conn = await getConnect();
         try {
-            const result = await conn.query(`UPDATE message SET status = 0 WHERE messageid = ?`, [req.body.id]);
+            const result = await conn.query(`UPDATE message SET status = 0 WHERE message_id = ?`, [req.body.id]);
             res.send({ success: true });
         } catch (err) {
             console.error(err);

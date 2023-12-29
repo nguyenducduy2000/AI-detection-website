@@ -16,33 +16,39 @@ function Filter({ onFilterSubmit }) {
     // Calendar setting
     const [valueFrom, setValueFrom] = useState(null);
     const [valueTo, setValueTo] = useState(null);
-    const [objectType, setObjectType] = useState(null);
-    const [sensorID, setSensorID] = useState(null);
+    const [eventType, setEventType] = useState('all');
+    const [cameraID, setSensorID] = useState('all');
     const [status, setStatus] = useState('all');
     const handleSubmit = (event) => {
         event.preventDefault();
 
         // Set the time in the From calendar to the start of the day
         const startOfDayFrom = valueFrom ? new Date(valueFrom.setHours(0, 0, 0, 0)) : null;
+        if (startOfDayFrom) {
+            startOfDayFrom.setMinutes(startOfDayFrom.getMinutes() - startOfDayFrom.getTimezoneOffset());
+        }
         const formattedValueFrom = startOfDayFrom ? startOfDayFrom.toISOString() : null;
 
         // Set the time in the To calendar to the end of the day
         const endOfDayTo = valueTo ? new Date(valueTo.setHours(23, 59, 59, 999)) : null;
+        if (endOfDayTo) {
+            endOfDayTo.setMinutes(endOfDayTo.getMinutes() - endOfDayTo.getTimezoneOffset());
+        }
         const formattedValueTo = endOfDayTo ? endOfDayTo.toISOString() : null;
 
-        // Check if objectType and sensorID are empty strings and set them to null
-        if (objectType === '') {
-            setObjectType(null);
+        // Check if eventType and cameraID are empty strings and set them to null
+        if (eventType === '') {
+            setEventType(null);
         }
-        if (sensorID === '') {
+        if (cameraID === '') {
             setSensorID(null);
         }
 
         const filterData = {
-            objectType,
+            eventType,
             timeFrom: formattedValueFrom,
             timeTo: formattedValueTo,
-            sensorID,
+            cameraID,
             status,
         };
         console.log(filterData);
@@ -50,9 +56,9 @@ function Filter({ onFilterSubmit }) {
         // Check the current URL and navigate accordingly
         const currentUrl = window.location.pathname;
         if (currentUrl.includes('/chart')) {
-            navigate(`/chart/filter/${objectType}/${formattedValueFrom}/${formattedValueTo}/${sensorID}/${status}`);
+            navigate(`/chart/filter/${eventType}/${formattedValueFrom}/${formattedValueTo}/${cameraID}/${status}`);
         } else {
-            navigate(`/filter/${objectType}/${formattedValueFrom}/${formattedValueTo}/${sensorID}/${status}`);
+            navigate(`/filter/${eventType}/${formattedValueFrom}/${formattedValueTo}/${cameraID}/${status}`);
         }
         setFilterParams(filterData);
         onFilterSubmit();
@@ -61,74 +67,72 @@ function Filter({ onFilterSubmit }) {
     return (
         <Form className="mb-3" onSubmit={handleSubmit} method="GET" action="/filter">
             <Form.Group className="m-3">
-                <Form.Label>Object type</Form.Label>
+                <Form.Label className="fw-bold">Event type</Form.Label>
                 <Form.Select
-                    name="objectType"
+                    name="eventType"
                     aria-label="Default select example"
-                    value={objectType || ''}
-                    onChange={(event) => setObjectType(event.target.value || null)}
+                    value={eventType || ''}
+                    onChange={(event) => setEventType(event.target.value || 'all')}
                 >
-                    <option value="">All</option>
-                    <option value="type_1">Type 1</option>
-                    <option value="type_2">Type 2</option>
-                    <option value="type_3">Type 3</option>
+                    <option value="all">All</option>
+                    <option value="human_event">Human Event</option>
+                    <option value="vehicle_event">Vehicle Event</option>
                 </Form.Select>
             </Form.Group>
 
             <Form.Group name="timestamp" className="m-3">
-                <Form.Label>Time</Form.Label>
-                <div className="d-flex justify-content-around m-1">
-                    <div>
-                        {valueFrom ? (
-                            <Form.Label>From: {valueFrom.toLocaleDateString()}</Form.Label>
-                        ) : (
-                            <Form.Label>Please choose a date</Form.Label>
-                        )}
-                        <Calendar
-                            onChange={(value) => {
-                                if (value.getTime() === valueFrom?.getTime()) {
-                                    // If the clicked date is the same as the current selected date, deselect it
-                                    setValueFrom(null);
-                                } else {
-                                    setValueFrom(value);
-                                }
+                <Form.Label className="fw-bold">Time</Form.Label>
+                <div className="d-flex align-items-center m-1 flex-column">
+                    {valueFrom && valueTo ? (
+                        <div>
+                            <Form.Label>
+                                Selected Range: <span className="fw-bold">{valueFrom.toLocaleDateString()}</span> to{' '}
+                                <span className="fw-bold">{valueTo.toLocaleDateString()}</span>
+                            </Form.Label>
+                        </div>
+                    ) : (
+                        <Form.Label>Please choose a date range (range reqired)</Form.Label>
+                    )}
+                    <Calendar
+                        onChange={(value) => {
+                            if (Array.isArray(value) && value.length === 2) {
+                                setValueFrom(value[0]);
+                                setValueTo(value[1]);
+                            } else {
+                                setValueFrom(null);
+                                setValueTo(null);
+                            }
+                        }}
+                        value={[valueFrom, valueTo]}
+                        selectRange={true}
+                    />
+                    {valueFrom && valueTo && (
+                        <Button
+                            className="m-2"
+                            variant="outline-secondary"
+                            onClick={() => {
+                                setValueFrom(null);
+                                setValueTo(null);
                             }}
-                            value={valueFrom}
-                        />
-                    </div>
-                    <div>
-                        {valueTo ? (
-                            <Form.Label>To: {valueTo.toLocaleDateString()}</Form.Label>
-                        ) : (
-                            <Form.Label>Please choose a date</Form.Label>
-                        )}
-                        <Calendar
-                            onChange={(value) => {
-                                if (value.getTime() === valueTo?.getTime()) {
-                                    // If the clicked date is the same as the current selected date, deselect it
-                                    setValueTo(null);
-                                } else {
-                                    setValueTo(value);
-                                }
-                            }}
-                            value={valueTo}
-                        />
-                    </div>
+                        >
+                            Cancel
+                        </Button>
+                    )}
                 </div>
             </Form.Group>
 
             <Form.Group
                 className="m-3"
                 controlId="formBasicCheckbox"
-                value={sensorID || ''}
-                onChange={(event) => setSensorID(event.target.value || null)}
+                value={cameraID || ''}
+                onChange={(event) => setSensorID(event.target.value || 'all')}
             >
-                <Form.Label>Sensor ID</Form.Label>
-                <Form.Select name="sensorID" aria-label="Default select example">
-                    <option value="">All</option>
-                    <option value="1">Sensor 1</option>
-                    <option value="2">Sensor 2</option>
-                    <option value="3">Sensor 3</option>
+                <Form.Label className="fw-bold">Camera ID</Form.Label>
+                <Form.Select name="cameraID" aria-label="Default select example">
+                    <option value="all">All</option>
+                    <option value="0001">Camera 0001</option>
+                    <option value="0002">Camera 0002</option>
+                    <option value="0003">Camara 0003</option>
                 </Form.Select>
             </Form.Group>
 
@@ -138,7 +142,7 @@ function Filter({ onFilterSubmit }) {
                 value={status || 'all'}
                 onChange={(event) => setStatus(event.target.value || 'all')}
             >
-                <Form.Label>Status</Form.Label>
+                <Form.Label className="fw-bold">Status</Form.Label>
                 <Form.Select name="status" aria-label="Default select example">
                     <option value="all">All</option>
                     <option value="1">Approved</option>

@@ -16,7 +16,7 @@ credentials
 /src/public
 *.txt
 test.js
-cloudsql-test.session.sql
+local-mysql-docker.session.sql
 mysql-db
 /src/utils/rabbitMQ/Topic
 post.js

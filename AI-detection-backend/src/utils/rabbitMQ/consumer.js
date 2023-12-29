@@ -3,10 +3,18 @@ const getConnect = require('../Database');
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../../../.env') });
 
+let conn;
+
+const createConnection = async () => {
+    if (!conn) {
+        conn = await amqlib.connect(process.env.AMQP_URL_CLOUD);
+    }
+};
+
 const receiveMessage = async () => {
     try {
         // 1. create Connect
-        const conn = await amqlib.connect(process.env.AMQP_URL_CLOUD);
+        await createConnection(); // Create or reuse the connection
 
         // 2. create Channel
         const channel = await conn.createChannel();
@@ -67,8 +75,7 @@ const receiveMessage = async () => {
                     };
                     eventArray.push(messageEvent);
                 });
-                // console.log(objectArray);
-                // console.log(eventArray);
+
                 await Promise.all([
                     // message
                     dbconn.query(
@@ -85,11 +92,11 @@ const receiveMessage = async () => {
                             data.video_URL,
                         ],
                     ),
-                    // object
+                    // insert into object table
                     objectArray.forEach((objectData) => {
                         dbconn.query('INSERT INTO object SET ?', objectData);
                     }),
-                    // event
+                    // insert into event table
                     eventArray.forEach((eventData) => {
                         dbconn.query('INSERT INTO event SET ?', eventData);
                     }),
@@ -97,7 +104,7 @@ const receiveMessage = async () => {
                     console.log('Data inserted successfully');
                 });
                 // Acknowledge message
-                channel.ack(msg);
+                await channel.ack(msg);
             } catch (error) {
                 console.log(error);
             } finally {

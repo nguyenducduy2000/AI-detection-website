@@ -40,16 +40,16 @@ export default {
             });
     },
 
-    filter: ({ objectType, timeFrom, timeTo, sensorID, status }) => {
+    filter: ({ eventType, timeFrom, timeTo, cameraID, status }) => {
         // console.log('filter API is being called');
         const options = {
             method: 'GET',
             url: '/filter',
             params: {
-                objectType,
+                eventType,
                 timeFrom,
                 timeTo,
-                sensorID,
+                cameraID,
                 status,
             },
         };
