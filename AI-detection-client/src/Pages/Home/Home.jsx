@@ -4,7 +4,7 @@ import { Button } from 'react-bootstrap';
 
 import ModalVideo from '~/Components/ModalVideo';
 import ModalConfirm from '~/Components/ModalConfirm';
-import ViolationCard from '~/Components/ViolationCard/ViolationCard';
+import ViolationCard from '~/Components/ViolationCard/';
 import PaginationPage from '~/Components/PaginationPage';
 import renderService from '~/services/renderService';
 import { useStore } from '~/store';
@@ -52,7 +52,7 @@ function Home() {
     //  Paginations setting
     const [loading, setLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
-    const [eventsPerPage] = useState(10);
+    const [eventsPerPage] = useState(12);
 
     const handleCardClick = useCallback(
         async (id) => {

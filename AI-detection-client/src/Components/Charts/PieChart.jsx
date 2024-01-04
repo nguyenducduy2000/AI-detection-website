@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import { Pie } from 'react-chartjs-2';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 // eslint-disable-next-line no-unused-vars
 import { Chart as ChartJS } from 'chart.js/auto';
 
@@ -8,30 +9,22 @@ function PieChart({ chartData, target, options = {}, loading, ...props }) {
     if (loading) {
         return <p>Loading...</p>;
     }
-
     const counts = chartData.reduce((acc, data) => {
-        if (acc[data[target]]) {
-            acc[data[target]] += 1;
-        } else {
-            acc[data[target]] = 1;
-        }
+        data.eventList.forEach((event) => {
+            const targetValue = event[target];
+            if (targetValue) {
+                if (acc[targetValue]) {
+                    acc[targetValue] += 1;
+                } else {
+                    acc[targetValue] = 1;
+                }
+            }
+        });
         return acc;
     }, {});
-    // console.log('counts: ', counts);
+    // console.log('counts: ', counts);s
 
     const labels = Object.keys(counts);
-    // console.log('labels: ', labels);
-    // // new labels for chart
-    // const newLabels = labels.map((label) => {
-    //     if (parseInt(label) === 1) {
-    //         return 'Approved';
-    //     } else if (parseInt(label) === 0) {
-    //         return 'Rejected';
-    //     } else {
-    //         return 'Not checked';
-    //     }
-    // });
-    // console.log('newLabels: ', newLabels);
     const datasets = [
         {
             label: props.label || 'Label',
@@ -62,16 +55,36 @@ function PieChart({ chartData, target, options = {}, loading, ...props }) {
             <div className="m-2">
                 <Pie
                     data={{ ...fetchedChartData }}
+                    plugins={[ChartDataLabels]}
                     options={{
                         plugins: {
                             title: {
                                 display: true,
                                 text: props.title || 'Pie Chart',
-                                fontSize: 25,
+                                font: {
+                                    size: 24,
+                                },
                             },
                             legend: {
                                 display: true,
-                                position: 'right',
+                                position: 'bottom',
+                            },
+                            datalabels: {
+                                display: true,
+                                color: '#666',
+                                font: {
+                                    size: 18,
+                                },
+                                align: 'center',
+                                formatter: (value, context) => {
+                                    const datapoint = context.chart.data.datasets[0].data;
+                                    function totalSum(total, datapoint) {
+                                        return total + datapoint;
+                                    }
+                                    const total = datapoint.reduce(totalSum, 0);
+                                    const percentage = ((value / total) * 100).toFixed(2);
+                                    return `${percentage}%`;
+                                },
                             },
                         },
                         layout: {

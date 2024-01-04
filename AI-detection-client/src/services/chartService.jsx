@@ -22,16 +22,17 @@ export default {
             });
     },
 
-    chartFilter: ({ objectType, timeFrom, timeTo, sensorID }) => {
+    chartFilter: ({ eventType, timeFrom, timeTo, cameraID, status }) => {
         // console.log('filter API is being called');
         const options = {
             method: 'GET',
-            url: '/chart/filter',
+            url: '/filter',
             params: {
-                objectType,
+                eventType,
                 timeFrom,
                 timeTo,
-                sensorID,
+                cameraID,
+                status,
             },
         };
         return httpRequest(options)

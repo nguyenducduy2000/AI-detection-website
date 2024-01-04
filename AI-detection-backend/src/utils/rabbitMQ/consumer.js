@@ -33,10 +33,59 @@ const receiveMessage = async () => {
             try {
                 objectArray = [];
                 eventArray = [];
+                // Add the required SQL queries to check if the IDs exist
+
                 const data = await JSON.parse(msg.content.toString());
                 // console.log('Msg::::', data);
                 // channel.ack(msg);
+                await Promise.all([
+                    // Check if the camera_id exists
+                    dbconn.query('SELECT * FROM camera WHERE camera_id = ?', [data.camera.id]),
+                    // Check if the model_id exists
+                    dbconn.query('SELECT * FROM model WHERE model_id = ?', [data.model.id]),
+                    // Check if the location_id exists
+                    dbconn.query('SELECT * FROM location WHERE location_id = ?', [data.location.id]),
+                ]).then(([cameraResult, modelResult, locationResult]) => {
+                    // console.log('cameraResult: ', cameraResult[0]);
+                    // console.log('modelResult: ', modelResult[0]);
+                    // console.log('locationResult: ', locationResult[0]);
+                    // If any of the result sets are empty, it means the corresponding IDs don't exist
+                    const isCameraExists = cameraResult[0].length > 0;
+                    const isModelExists = modelResult[0].length > 0;
+                    const isLocationExists = locationResult[0].length > 0;
 
+                    console.log(isCameraExists, isModelExists, isLocationExists);
+
+                    if (!isCameraExists) {
+                        // Insert new data to the camera table
+                        // console.log('Insert new data to the camera table');
+                        dbconn.query('INSERT IGNORE INTO camera (camera_id, type, description) VALUES (?,?,?)', [
+                            data.camera.id,
+                            data.camera.type,
+                            data.camera.description,
+                        ]);
+                    }
+
+                    if (!isModelExists) {
+                        // Insert new data to the model table
+                        // console.log('Insert new data to the model table');
+                        dbconn.query('INSERT IGNORE INTO model (model_id, description) VALUES (?,?)', [
+                            data.model.id,
+                            data.model.description,
+                        ]);
+                    }
+
+                    if (!isLocationExists) {
+                        // Insert new data to the location table
+                        // console.log('Insert new data to the location table');
+                        dbconn.query('INSERT IGNORE INTO location (location_id, lat, lon, alt) VALUES (?,?,?,?)', [
+                            data.location.id,
+                            data.location.lat,
+                            data.location.lon,
+                            data.location.alt,
+                        ]);
+                    }
+                });
                 // Put object_list data into an Array
                 data.object_list.forEach((obj) => {
                     const objectType = Object.keys(obj)[0];
@@ -79,11 +128,11 @@ const receiveMessage = async () => {
                 await Promise.all([
                     // message
                     dbconn.query(
-                        'INSERT INTO message (message_id, timestamp, location_id, model_id, camera_id, number_of_objects, number_of_events, image_URL, video_URL) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                        'INSERT IGNORE INTO message (message_id, timestamp, location_id, model_id, camera_id, number_of_objects, number_of_events, image_URL, video_URL) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
                         [
                             data.message_id,
                             data.timestamp,
-                            data.location_id,
+                            data.location.id,
                             data.model.id,
                             data.camera.id,
                             data.number_of_objects,
@@ -94,17 +143,19 @@ const receiveMessage = async () => {
                     ),
                     // insert into object table
                     objectArray.forEach((objectData) => {
-                        dbconn.query('INSERT INTO object SET ?', objectData);
+                        dbconn.query('INSERT IGNORE INTO object SET ?', objectData);
                     }),
                     // insert into event table
                     eventArray.forEach((eventData) => {
-                        dbconn.query('INSERT INTO event SET ?', eventData);
+                        dbconn.query('INSERT IGNORE INTO event SET ?', eventData);
                     }),
                 ]).then(() => {
                     console.log('Data inserted successfully');
+                    // Acknowledge message
+                    channel.ack(msg);
                 });
-                // Acknowledge message
-                await channel.ack(msg);
+                const warning = await dbconn.query('SHOW WARNINGS');
+                console.log(warning);
             } catch (error) {
                 console.log(error);
             } finally {
@@ -120,5 +171,7 @@ const receiveMessage = async () => {
         console.log(error);
     }
 };
+
+receiveMessage();
 
 module.exports = receiveMessage;

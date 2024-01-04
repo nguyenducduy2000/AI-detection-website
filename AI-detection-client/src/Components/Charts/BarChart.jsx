@@ -1,5 +1,7 @@
 import PropTypes from 'prop-types';
 import { Bar } from 'react-chartjs-2';
+// import ChartDataLabels from 'chartjs-plugin-datalabels';
+
 // eslint-disable-next-line no-unused-vars
 import { Chart as ChartJS } from 'chart.js/auto';
 
@@ -8,18 +10,28 @@ function BarChart({ chartData, target, options = {}, loading, ...props }) {
     if (loading) {
         return <p>Loading...</p>;
     }
-
     const counts = chartData.reduce((acc, data) => {
-        if (acc[data[target]]) {
-            acc[data[target]] += 1;
+        // Extract the date from the timestamp
+        const date = new Date(data[target]);
+        const formattedDate = date.toISOString().split('T')[0];
+
+        if (acc[formattedDate]) {
+            acc[formattedDate] += 1;
         } else {
-            acc[data[target]] = 1;
+            acc[formattedDate] = 1;
         }
         return acc;
     }, {});
     // console.log('counts: ', counts);
+    // Limit the counts to a maximum of 30 days
+    const limitedCounts = Object.keys(counts)
+        .slice(-30)
+        .reduce((acc, key) => {
+            acc[key] = counts[key];
+            return acc;
+        }, {});
 
-    const labels = Object.keys(counts);
+    const labels = Object.keys(limitedCounts);
     const datasets = [
         {
             label: props.label || 'Label',
@@ -50,17 +62,28 @@ function BarChart({ chartData, target, options = {}, loading, ...props }) {
             <div className="m-2">
                 <Bar
                     data={{ ...fetchedChartData }}
+                    // plugins={[ChartDataLabels]}
                     options={{
                         plugins: {
                             title: {
                                 display: true,
                                 text: props.title || 'Pie Chart',
-                                fontSize: 25,
+                                font: {
+                                    size: 20,
+                                },
                             },
                             legend: {
                                 display: true,
-                                position: 'right',
+                                position: 'bottom',
                             },
+                            // datalabels: {
+                            //     display: true,
+                            //     color: '#666',
+                            //     font: {
+                            //         size: 14,
+                            //     },
+                            //     align: 'center',
+                            // },
                         },
                         layout: {
                             padding: 10,
@@ -70,6 +93,9 @@ function BarChart({ chartData, target, options = {}, loading, ...props }) {
                         scales: {
                             y: {
                                 beginAtZero: true,
+                                ticks: {
+                                    precision: 0,
+                                },
                             },
                         },
                     }}

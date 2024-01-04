@@ -65,6 +65,7 @@ function Header() {
 
     useEffect(() => {
         if (isActivate) {
+            setActiveLink('home');
             setOpenFilter(false);
         }
     }, [isActivate, setOpenFilter]);
@@ -98,6 +99,7 @@ function Header() {
                                     onClick={() => {
                                         setActiveLink('link');
                                         setOpenFilter(false);
+                                        setIsActivate(false);
                                     }}
                                 >
                                     Chart

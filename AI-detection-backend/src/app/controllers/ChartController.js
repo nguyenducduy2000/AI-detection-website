@@ -9,12 +9,15 @@ class ChartController {
         const conn = await getConnect();
         try {
             console.log('call API to /chart');
-            const result =
+            const eventResult =
                 await conn.query(`SELECT DISTINCT *, model.description AS model_description, camera.description AS camera_description 
                                             FROM message                                
                                             JOIN model ON message.model_id = model.model_id
                                             JOIN camera ON message.camera_id = camera.camera_id`);
-            const data = result[0].map((row) => ({
+            const infoResult = await conn.query(`SELECT *
+                                                FROM object
+                                                INNER JOIN event ON object.message_id = event.message_id`);
+            const data = eventResult[0].map((row) => ({
                 messageId: row.message_id,
                 timestamp: row.timestamp,
                 locationId: row.location_id,
@@ -28,10 +31,12 @@ class ChartController {
                 modelDescription: row.model_description,
                 cameraType: row.type,
                 cameraDescription: row.camera_description,
+                eventList: infoResult[0].filter((event) => event.message_id === row.message_id),
             }));
             // Convert JSON object to string
+            // console.log(data);
+            // console.log('eventList:::', data[0].eventList);
             const jsonString = JSON.stringify(data);
-            // console.log(jsonString);
             res.send(jsonString);
         } catch (err) {
             console.error(err);
@@ -65,18 +70,11 @@ class ChartController {
                 queryParams.push(req.query.eventType);
             }
 
-            if (req.query.timeFrom) {
+            if (req.query.timeFrom && req.query.timeTo) {
                 const timeFrom = new Date(req.query.timeFrom).toISOString();
-                console.log('timeFrom: ', timeFrom);
-                myQuery += ` AND message.timestamp >= ?`;
-                queryParams.push(timeFrom);
-            }
-
-            if (req.query.timeTo) {
                 const timeTo = new Date(req.query.timeTo).toISOString();
-                console.log('timeTo: ', timeTo);
-                myQuery += ` AND message.timestamp <= ?`;
-                queryParams.push(timeTo);
+                myQuery += ` AND message.timestamp >= ? AND message.timestamp <= ?`;
+                queryParams.push(timeFrom, timeTo);
             }
 
             if (req.query.cameraID && req.query.cameraID !== 'all') {
@@ -97,8 +95,11 @@ class ChartController {
                 }
             }
             // console.log(myQuery);
-            const result = await conn.query(myQuery, queryParams);
-            const data = result[0].map((row) => ({
+            const eventResult = await conn.query(myQuery, queryParams);
+            const infoResult = await conn.query(`SELECT *
+            FROM object
+            INNER JOIN event ON object.message_id = event.message_id`);
+            const data = eventResult[0].map((row) => ({
                 messageId: row.message_id,
                 timestamp: row.timestamp,
                 locationId: row.location_id,
@@ -112,6 +113,7 @@ class ChartController {
                 modelDescription: row.model_description,
                 cameraType: row.type,
                 cameraDescription: row.camera_description,
+                eventList: infoResult[0].filter((event) => event.message_id === row.message_id),
             }));
             // console.log(data);
             // Convert JSON object to string

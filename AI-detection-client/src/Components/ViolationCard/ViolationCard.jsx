@@ -40,7 +40,7 @@ function ViolationCard({ data, handleModalVideoToggle, handleModalConfirmToggle,
                             <span className="fw-bold">Timestamp:</span> {data.timestamp}
                         </div>
                         <div className="card-span">
-                            <span className="fw-bold">Locaion_id:</span> {data.location_id}
+                            <span className="fw-bold">Locaion_id:</span> {data.locationId}
                         </div>
                         <div className="card-span">
                             <span className="fw-bold">Model:</span> {data.modelDescription}
@@ -56,6 +56,10 @@ function ViolationCard({ data, handleModalVideoToggle, handleModalConfirmToggle,
                         </div>
                         <div className="card-span">
                             <span className="fw-bold">Number of Events:</span> {data.numberOfEvents}
+                        </div>
+                        <div className="card-span">
+                            <span className="fw-bold">Event list:</span>{' '}
+                            {data.eventList.map((event) => event.event_type).join(', ')}
                         </div>
                         <div className="card-span">
                             <span className="fw-bold">Status:</span>{' '}

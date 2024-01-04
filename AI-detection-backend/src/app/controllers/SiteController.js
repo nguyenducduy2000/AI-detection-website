@@ -9,12 +9,15 @@ class SiteController {
         const conn = await getConnect();
         try {
             console.log('call API to /');
-            const result =
+            const eventResult =
                 await conn.query(`SELECT DISTINCT *, model.description AS model_description, camera.description AS camera_description 
                                             FROM message                                
                                             INNER JOIN model ON message.model_id = model.model_id
                                             INNER JOIN camera ON message.camera_id = camera.camera_id`);
-            const data = result[0].map((row) => ({
+            const infoResult = await conn.query(`SELECT object.message_id as message_id, event_type
+                                                FROM object
+                                                INNER JOIN event ON object.message_id = event.message_id`);
+            const data = eventResult[0].map((row) => ({
                 messageId: row.message_id,
                 timestamp: row.timestamp,
                 locationId: row.location_id,
@@ -22,6 +25,7 @@ class SiteController {
                 cameraId: row.camera_id,
                 numberOfObjects: row.number_of_objects,
                 numberOfEvents: row.number_of_events,
+                eventList: infoResult[0].filter((event) => event.message_id === row.message_id),
                 status: row.status,
                 imageURL: row.image_URL,
                 videoURL: row.video_URL,
@@ -30,9 +34,9 @@ class SiteController {
                 cameraDescription: row.camera_description,
             }));
             // Convert JSON object to string
-            // const jsonString = JSON.stringify(data);
+            const jsonString = JSON.stringify(data);
             // console.log(jsonString);
-            res.send(data);
+            res.send(jsonString);
         } catch (err) {
             console.error(err);
             res.status(500).send({ error: 'Internal Server Error' });
@@ -56,7 +60,7 @@ class SiteController {
             const fiveMinutesAgo = new Date();
             fiveMinutesAgo.setMinutes(fiveMinutesAgo.getMinutes() - 5);
 
-            const result = await conn.query(
+            const eventResult = await conn.query(
                 `SELECT DISTINCT *, model.description AS model_description, camera.description AS camera_description 
                 FROM message                                
                 INNER JOIN model ON message.model_id = model.model_id
@@ -64,7 +68,10 @@ class SiteController {
                 WHERE timestamp >= ?`,
                 [fiveMinutesAgo],
             );
-            const data = result[0].map((row) => ({
+            const infoResult = await conn.query(`SELECT object.message_id as message_id, event_type
+                                                FROM object
+                                                INNER JOIN event ON object.message_id = event.message_id`);
+            const data = eventResult[0].map((row) => ({
                 messageId: row.message_id,
                 timestamp: row.timestamp,
                 locationId: row.location_id,
@@ -72,6 +79,7 @@ class SiteController {
                 cameraId: row.camera_id,
                 numberOfObjects: row.number_of_objects,
                 numberOfEvents: row.number_of_events,
+                events: infoResult[0].filter((event) => event.message_id === row.message_id),
                 status: row.status,
                 imageURL: row.image_URL,
                 videoURL: row.video_URL,
@@ -185,8 +193,11 @@ class SiteController {
                 }
             }
             // console.log(myQuery);
-            const result = await conn.query(myQuery, queryParams);
-            const data = result[0].map((row) => ({
+            const eventResult = await conn.query(myQuery, queryParams);
+            const infoResult = await conn.query(`SELECT object.message_id as message_id, event_type
+            FROM object
+            INNER JOIN event ON object.message_id = event.message_id`);
+            const data = eventResult[0].map((row) => ({
                 messageId: row.message_id,
                 timestamp: row.timestamp,
                 locationId: row.location_id,
@@ -194,6 +205,7 @@ class SiteController {
                 cameraId: row.camera_id,
                 numberOfObjects: row.number_of_objects,
                 numberOfEvents: row.number_of_events,
+                eventList: infoResult[0].filter((event) => event.message_id === row.message_id),
                 status: row.status,
                 imageURL: row.image_URL,
                 videoURL: row.video_URL,

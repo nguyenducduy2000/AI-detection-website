@@ -4,7 +4,7 @@ import { useStore } from '~/store';
 // import renderService from '~/services/renderService';
 import { chartService } from '~/services';
 // import Chart Components
-import { BarChart, PieChart, DoughnutChart, LineChart } from '~/Components/Charts';
+import { BarChart, PieChart, DoughnutChart, StackedChart } from '~/Components/Charts';
 
 function Chart() {
     const [loading, setLoading] = useState(false);
@@ -41,31 +41,30 @@ function Chart() {
                 <div className="row row-col-sm-1 row-cols-xl-2 g-2 g-lg-3">
                     <PieChart
                         chartData={chartData}
-                        target={'object_id'}
-                        title={'Detection type of AI detection'}
+                        target={'event_type'}
+                        title={'Events distribution'}
                         label={'Amount of events'}
+                        loading={loading}
+                    />
+                    <BarChart
+                        chartData={chartData}
+                        target={'timestamp'}
+                        title={'Events detected during timestamp'}
+                        label={'Number of events detected'}
                         loading={loading}
                     />
                     <DoughnutChart
                         chartData={chartData}
                         target={'status'}
                         title={'Current status of AI detection logs'}
-                        labels={['Rejected', 'Approved', 'Not checked']}
-                        label={'Status'}
+                        label={'Status count'}
                         loading={loading}
                     />
-                    <BarChart
+                    <StackedChart
                         chartData={chartData}
-                        target={'object_id'}
+                        target={['cameraId', 'modelId', 'locationId']}
                         title={'Current status of AI detection'}
-                        label={'Detection type'}
-                        loading={loading}
-                    />
-                    <LineChart
-                        chartData={chartData}
-                        target={'object_id'}
-                        title={'Current status of AI detection'}
-                        label={'Detection type'}
+                        label={['Camera count', 'Model count', 'Location count']}
                         loading={loading}
                     />
                 </div>
