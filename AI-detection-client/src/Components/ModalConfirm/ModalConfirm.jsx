@@ -24,6 +24,8 @@ function ModalConfirm({ show, onHide, data, eventChoice, onApiCallSuccess, ...pa
             return `You are about to Accept ${data.messageId}. Do you want to continue?`;
         } else if (eventChoice && eventChoice.classList.contains('reject-btn')) {
             return `You are about to Reject ${data.messageId}. Do you want to continue?`;
+        } else if (eventChoice && eventChoice.classList.contains('discard-btn')) {
+            return `You are about to Discard Acknowledge ${data.messageId}. Do you want to continue?`;
         }
     };
 
@@ -43,6 +45,17 @@ function ModalConfirm({ show, onHide, data, eventChoice, onApiCallSuccess, ...pa
             console.log('reject');
             updateService
                 .reject(data.messageId)
+                .then(() => {
+                    // console.log('trigger ApiCallSuccess');
+                    onApiCallSuccess();
+                })
+                .catch((error) => {
+                    console.error(error);
+                });
+        } else if (eventChoice && eventChoice.classList.contains('discard-btn')) {
+            console.log('discard acknowledge');
+            updateService
+                .discardAck(data.messageId)
                 .then(() => {
                     // console.log('trigger ApiCallSuccess');
                     onApiCallSuccess();

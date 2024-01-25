@@ -52,9 +52,16 @@ function ModalVideo({ loading, show, onHide, data, eventInfo, handleModalConfirm
                 </div>
                 <div className="mt-3">
                     <div className="container-fluid">
-                        <div className={clsx('row', { 'row-cols-3': isRowCols3, 'row-cols-1': isSmallScreen })}>
+                        <div
+                            className={clsx('row', 'g-3', {
+                                'row-cols-3': isRowCols3,
+                                'row-cols-1': isSmallScreen,
+                            })}
+                        >
                             {eventInfo.length > 0 ? (
-                                eventInfo.map((info) => <EventInfo key={info['objectID']} info={info} />)
+                                eventInfo.map((info) => (
+                                    <EventInfo key={info['objectID']} info={info} className="col" />
+                                ))
                             ) : (
                                 <div className="d-flex flex-fill justify-content-center align-items-center">
                                     {loading ? (

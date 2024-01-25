@@ -53,57 +53,63 @@ function PieChart({ chartData, target, options = {}, loading, ...props }) {
     return (
         <div className="chart col border">
             <div className="m-2">
-                <Pie
-                    data={{ ...fetchedChartData }}
-                    plugins={[ChartDataLabels]}
-                    options={{
-                        plugins: {
-                            title: {
-                                display: true,
-                                text: props.title || 'Pie Chart',
-                                font: {
-                                    size: 24,
+                {chartData.eventList ? (
+                    <Pie
+                        data={{ ...fetchedChartData }}
+                        plugins={[ChartDataLabels]}
+                        options={{
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: props.title || 'Pie Chart',
+                                    font: {
+                                        size: 24,
+                                    },
+                                },
+                                legend: {
+                                    display: true,
+                                    position: 'bottom',
+                                },
+                                datalabels: {
+                                    display: true,
+                                    color: '#666',
+                                    font: {
+                                        size: 18,
+                                    },
+                                    align: 'center',
+                                    formatter: (value, context) => {
+                                        const datapoint = context.chart.data.datasets[0].data;
+                                        function totalSum(total, datapoint) {
+                                            return total + datapoint;
+                                        }
+                                        const total = datapoint.reduce(totalSum, 0);
+                                        const percentage = ((value / total) * 100).toFixed(2);
+                                        return `${percentage}%`;
+                                    },
                                 },
                             },
-                            legend: {
-                                display: true,
-                                position: 'bottom',
+                            layout: {
+                                padding: 10,
                             },
-                            datalabels: {
-                                display: true,
-                                color: '#666',
-                                font: {
-                                    size: 18,
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                xAxis: {
+                                    display: false,
                                 },
-                                align: 'center',
-                                formatter: (value, context) => {
-                                    const datapoint = context.chart.data.datasets[0].data;
-                                    function totalSum(total, datapoint) {
-                                        return total + datapoint;
-                                    }
-                                    const total = datapoint.reduce(totalSum, 0);
-                                    const percentage = ((value / total) * 100).toFixed(2);
-                                    return `${percentage}%`;
+                                yAxis: {
+                                    display: false,
                                 },
                             },
-                        },
-                        layout: {
-                            padding: 10,
-                        },
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            xAxis: {
-                                display: false,
-                            },
-                            yAxis: {
-                                display: false,
-                            },
-                        },
-                    }}
-                    width={600}
-                    height={600}
-                />
+                        }}
+                        width={600}
+                        height={600}
+                    />
+                ) : (
+                    <div className="d-flex m-auto">
+                        <h2>No data available</h2>
+                    </div>
+                )}
             </div>
         </div>
     );

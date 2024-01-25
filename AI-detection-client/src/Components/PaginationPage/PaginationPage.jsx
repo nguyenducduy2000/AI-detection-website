@@ -41,26 +41,12 @@ function PaginationPage({ eventsPerPage, totalEvents, paginate, currentPage }) {
                     (number >= currentPage - 2 && number <= currentPage + 2),
             );
 
-            let previousNumber = null;
-
             displayedPages.forEach((number) => {
-                if (previousNumber !== null && number !== previousNumber + 1) {
-                    if (number === currentPage - 2 && number !== firstPage + 1) {
-                        items.push(<Pagination.Ellipsis key="ellipsis-start" />);
-                    } else if (number === currentPage + 2 && number !== lastPage - 1) {
-                        items.push(<Pagination.Ellipsis key="ellipsis-end" />);
-                    } else {
-                        items.push(<Pagination.Ellipsis key={`ellipsis-${number - 1}`} />);
-                    }
-                }
-
                 items.push(
                     <Link key={number} onClick={() => paginateHandler(number)}>
                         <Pagination.Item active={number === currentPage}>{number}</Pagination.Item>
                     </Link>,
                 );
-
-                previousNumber = number;
             });
         }
 
@@ -69,7 +55,7 @@ function PaginationPage({ eventsPerPage, totalEvents, paginate, currentPage }) {
 
     return (
         <div className="mt-4 d-flex justify-content-center">
-            <Pagination size="md">
+            <Pagination size="md" padding="lg">
                 <Pagination.First disabled={currentPage === 1} onClick={() => paginateHandler(1)}>
                     First
                 </Pagination.First>
@@ -89,6 +75,17 @@ function PaginationPage({ eventsPerPage, totalEvents, paginate, currentPage }) {
                 >
                     Last
                 </Pagination.Last>
+                <select
+                    onChange={(e) => paginateHandler(Number(e.target.value))}
+                    value={currentPage}
+                    className="btn btn-outline-secondary ms-2"
+                >
+                    {pageNumbers.map((pageNumber) => (
+                        <option key={pageNumber} value={pageNumber}>
+                            {pageNumber}
+                        </option>
+                    ))}
+                </select>
             </Pagination>
         </div>
     );

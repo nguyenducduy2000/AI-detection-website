@@ -109,10 +109,13 @@ class SiteController {
             console.log(req.query);
             const result = await conn.query(
                 `
-                SELECT *
-                FROM object
-                INNER JOIN event ON object.message_id = event.message_id
-                WHERE object.message_id = ?`,
+                SELECT o.*, e.event_type, e.action
+                FROM object o
+                LEFT OUTER JOIN event e
+                    ON o.message_id = e.message_id
+                    and o.object_id = e.object_id
+                WHERE 
+                    o.message_id = ?`,
                 [req.query.messageId],
             );
             const data = result[0].map((row) => ({
@@ -253,6 +256,24 @@ class SiteController {
         const conn = await getConnect();
         try {
             const result = await conn.query(`UPDATE message SET status = 0 WHERE message_id = ?`, [req.body.id]);
+            res.send({ success: true });
+        } catch (err) {
+            console.error(err);
+            res.status(400).send({ error: 'Error updating message status' });
+        } finally {
+            try {
+                await conn.release();
+            } catch (err) {
+                console.error(err);
+            }
+        }
+    }
+
+    // PUT /discard-ack
+    async discardAck(req, res, next) {
+        const conn = await getConnect();
+        try {
+            const result = await conn.query(`UPDATE message SET status = NULL WHERE message_id = ?`, [req.body.id]);
             res.send({ success: true });
         } catch (err) {
             console.error(err);

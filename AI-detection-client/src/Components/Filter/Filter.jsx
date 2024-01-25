@@ -145,9 +145,9 @@ function Filter({ onFilterSubmit }) {
                 <Form.Label className="fw-bold">Status</Form.Label>
                 <Form.Select name="status" aria-label="Default select example">
                     <option value="all">All</option>
-                    <option value="1">Approved</option>
-                    <option value="0">Rejected</option>
-                    <option value="null">Not Checked</option>
+                    <option value="1">Acknowleded</option>
+                    <option value="0">Dissmissed</option>
+                    <option value="null">Pending</option>
                 </Form.Select>
             </Form.Group>
 

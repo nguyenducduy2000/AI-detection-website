@@ -35,4 +35,22 @@ export default {
                 console.log(err);
             });
     },
+
+    discardAck: (id) => {
+        const options = {
+            method: 'PUT',
+            url: '/discard-ack',
+            data: {
+                id,
+            },
+        };
+        return httpRequest(options)
+            .then((res) => {
+                console.log(res.data);
+                // res.send(res.data);
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    },
 };

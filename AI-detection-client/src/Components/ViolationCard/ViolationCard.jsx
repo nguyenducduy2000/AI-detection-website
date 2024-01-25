@@ -59,11 +59,13 @@ function ViolationCard({ data, handleModalVideoToggle, handleModalConfirmToggle,
                         </div>
                         <div className="card-span">
                             <span className="fw-bold">Event list:</span>{' '}
-                            {data.eventList.map((event) => event.event_type).join(', ')}
+                            {data.event_types
+                                ? Array.from(new Set(data.eventList.map((event) => event.event_type))).join(', ')
+                                : 'None'}
                         </div>
                         <div className="card-span">
                             <span className="fw-bold">Status:</span>{' '}
-                            {data.status === null ? 'Not checked' : data.status ? 'Approved' : 'Rejected'}
+                            {data.status === null ? 'Pending' : data.status ? 'Acknowledged' : 'Dissmissed'}
                         </div>
                     </div>
                 </div>
@@ -79,30 +81,46 @@ function ViolationCard({ data, handleModalVideoToggle, handleModalConfirmToggle,
                             Watch video
                         </button>
                     </div>
-                    <div className={clsx('mt-2', 'd-flex', 'flex-row', 'justify-content-between')}>
-                        <button
-                            ref={rejectButtonRef}
-                            className={clsx('btn', 'btn-danger', 'flex-fill', 'me-2', 'reject-btn')}
-                            type="button"
-                            onClick={() => {
-                                handleToggleModalConfirm(rejectButtonRef);
-                            }}
-                            disabled={loading}
-                        >
-                            Report
-                        </button>
-                        <button
-                            ref={acceptButtonRef}
-                            className={clsx('btn', 'btn-success', 'flex-fill', 'ms-2', 'accept-btn')}
-                            type="button"
-                            onClick={() => {
-                                handleToggleModalConfirm(acceptButtonRef);
-                            }}
-                            disabled={loading}
-                        >
-                            Accept
-                        </button>
-                    </div>
+                    {data.status !== null ? (
+                        <div className={clsx('mt-2', 'd-flex', 'flex-row', 'justify-content-between')}>
+                            <button
+                                ref={rejectButtonRef}
+                                className={clsx('btn', 'btn-danger', 'flex-fill', 'discard-btn')}
+                                type="button"
+                                onClick={() => {
+                                    handleToggleModalConfirm(rejectButtonRef);
+                                }}
+                                disabled={loading}
+                            >
+                                Discard Acknowledge
+                            </button>
+                        </div>
+                    ) : (
+                        <div className={clsx('mt-2', 'd-flex', 'flex-row', 'justify-content-between')}>
+                            <button
+                                ref={rejectButtonRef}
+                                className={clsx('btn', 'btn-danger', 'flex-fill', 'me-2', 'reject-btn')}
+                                type="button"
+                                onClick={() => {
+                                    handleToggleModalConfirm(rejectButtonRef);
+                                }}
+                                disabled={loading}
+                            >
+                                Dismiss
+                            </button>
+                            <button
+                                ref={acceptButtonRef}
+                                className={clsx('btn', 'btn-success', 'flex-fill', 'ms-2', 'accept-btn')}
+                                type="button"
+                                onClick={() => {
+                                    handleToggleModalConfirm(acceptButtonRef);
+                                }}
+                                disabled={loading}
+                            >
+                                Acknowledge
+                            </button>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

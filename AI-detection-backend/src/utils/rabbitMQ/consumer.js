@@ -7,7 +7,7 @@ let conn;
 
 const createConnection = async () => {
     if (!conn) {
-        conn = await amqlib.connect(process.env.AMQP_URL_CLOUD);
+        conn = await amqlib.connect(process.env.AMQP_URL_CLOUD_LAB);
     }
 };
 
@@ -20,7 +20,7 @@ const receiveMessage = async () => {
         const channel = await conn.createChannel();
 
         // 3. create name queue
-        const nameQueue = 'q1';
+        const nameQueue = 'message';
 
         // 4. create Queue
         await channel.assertQueue(nameQueue, {
@@ -128,7 +128,9 @@ const receiveMessage = async () => {
                 await Promise.all([
                     // message
                     dbconn.query(
-                        'INSERT IGNORE INTO message (message_id, timestamp, location_id, model_id, camera_id, number_of_objects, number_of_events, image_URL, video_URL) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                        `INSERT INTO message (message_id, timestamp, location_id, model_id, camera_id, number_of_objects, number_of_events, image_URL, video_URL) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) AS new_message
+                            ON DUPLICATE KEY UPDATE timestamp = new_message.timestamp, location_id = new_message.location_id, model_id = new_message.model_id, camera_id = new_message.camera_id,
+                            number_of_objects = new_message.number_of_objects, number_of_events = new_message.number_of_events, image_URL = new_message.image_URL, video_URL = new_message.video_URL`,
                         [
                             data.message_id,
                             data.timestamp,
@@ -143,11 +145,56 @@ const receiveMessage = async () => {
                     ),
                     // insert into object table
                     objectArray.forEach((objectData) => {
-                        dbconn.query('INSERT IGNORE INTO object SET ?', objectData);
+                        dbconn.query(`
+                        INSERT INTO object SET
+                            message_id = '${objectData.message_id}',
+                            object_id = '${objectData.object_id}',
+                            object_type = '${objectData.object_type}',
+                            gender = ${objectData.gender !== null ? `'${objectData.gender}'` : null},
+                            age = ${objectData.age !== null ? `'${objectData.age}'` : null},
+                            vehicle_type = ${objectData.vehicle_type !== null ? `'${objectData.vehicle_type}'` : null},
+                            vehicle_brand = ${
+                                objectData.vehicle_brand !== null ? `'${objectData.vehicle_brand}'` : null
+                            },
+                            vehicle_color = ${
+                                objectData.vehicle_color !== null ? `'${objectData.vehicle_color}'` : null
+                            },
+                            vehicle_licence = ${
+                                objectData.vehicle_licence !== null ? `'${objectData.vehicle_licence}'` : null
+                            },
+                            bbox_topleftx = ${objectData.bbox_topleftx},
+                            bbox_toplefty = ${objectData.bbox_toplefty},
+                            bbox_bottomrightx = ${objectData.bbox_bottomrightx},
+                            bbox_bottomrighty = ${objectData.bbox_bottomrighty}
+                        AS new_object
+                        ON DUPLICATE KEY UPDATE
+                            object_type = new_object.object_type,
+                            gender = new_object.gender,
+                            age = new_object.age,
+                            vehicle_type = new_object.vehicle_type,
+                            vehicle_brand = new_object.vehicle_brand,
+                            vehicle_color = new_object.vehicle_color,
+                            vehicle_licence = new_object.vehicle_licence,
+                            bbox_topleftx = new_object.bbox_topleftx,
+                            bbox_toplefty = new_object.bbox_toplefty,
+                            bbox_bottomrightx = new_object.bbox_bottomrightx,
+                            bbox_bottomrighty = new_object.bbox_bottomrighty
+                        `);
                     }),
                     // insert into event table
                     eventArray.forEach((eventData) => {
-                        dbconn.query('INSERT IGNORE INTO event SET ?', eventData);
+                        dbconn.query(`
+                        INSERT INTO event SET
+                            message_id = '${eventData.message_id}',
+                            object_id = '${eventData.object_id}',
+                            event_type = '${eventData.event_type}',
+                            action = '${eventData.action}'
+                        AS new_event
+                        ON DUPLICATE KEY UPDATE
+                            message_id = new_event.message_id,
+                            object_id = new_event.object_id,
+                            event_type = new_event.event_type,
+                            action = new_event.action`);
                     }),
                 ]).then(() => {
                     console.log('Data inserted successfully');
@@ -172,6 +219,6 @@ const receiveMessage = async () => {
     }
 };
 
-receiveMessage();
+// receiveMessage();
 
 module.exports = receiveMessage;
