@@ -33,4 +33,4 @@ receiveNoti.js
 *.njsproj
 *.sln
 *.sw?
-*.env*
+# *.env*

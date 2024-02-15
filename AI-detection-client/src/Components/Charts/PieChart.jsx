@@ -22,7 +22,7 @@ function PieChart({ chartData, target, options = {}, loading, ...props }) {
         });
         return acc;
     }, {});
-    // console.log('counts: ', counts);s
+    // console.log('counts: ', counts);
 
     const labels = Object.keys(counts);
     const datasets = [
@@ -53,7 +53,7 @@ function PieChart({ chartData, target, options = {}, loading, ...props }) {
     return (
         <div className="chart col border">
             <div className="m-2">
-                {chartData.eventList ? (
+                {counts ? (
                     <Pie
                         data={{ ...fetchedChartData }}
                         plugins={[ChartDataLabels]}

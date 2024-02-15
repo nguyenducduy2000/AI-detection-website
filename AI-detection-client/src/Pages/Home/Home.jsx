@@ -6,12 +6,22 @@ import ModalVideo from '~/Components/ModalVideo';
 import ModalConfirm from '~/Components/ModalConfirm';
 import ViolationCard from '~/Components/ViolationCard/';
 import PaginationPage from '~/Components/PaginationPage';
+import Toasts from '~/Components/Toasts';
 import renderService from '~/services/renderService';
 import { useStore } from '~/store';
 
 function Home() {
     // Get context from StoreContext
-    const { filterParams, isActivate, setIsActivate, openFilter, setOpenFilter } = useStore();
+    const {
+        filterParams,
+        isActivate,
+        setIsActivate,
+        openFilter,
+        setOpenFilter,
+        toastInfo,
+        setToastInfo,
+        setToastShow,
+    } = useStore();
 
     // Auto refresh page function
     const [refreshCount, setRefreshCount] = useState();
@@ -102,7 +112,7 @@ function Home() {
         };
 
         axiosFetchEvents();
-    }, [filterParams, confirmSuccessful, isActivate, setIsActivate, refreshCount]);
+    }, [filterParams, confirmSuccessful, isActivate, setIsActivate, refreshCount, toastInfo]);
 
     // Get current events when change page
     const indexOfLastEvent = currentPage * eventsPerPage;
@@ -114,16 +124,32 @@ function Home() {
     // Change page
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-    const handleApiCallSuccess = useCallback(() => {
-        // console.log('trigger ApiCallSuccess successful');
-        setConfirmSuccessful((prevApiCallSuccessful) => !prevApiCallSuccessful); // Set confirmSuccessful to trigger re-render
-        setModalConfirmShow(false); // Close the ModalConfirm component
-    }, []);
+    const handleApiCallSuccess = useCallback(
+        ({ ...message }) => {
+            // console.log('trigger ApiCallSuccess successful');
+            setConfirmSuccessful((prevApiCallSuccessful) => !prevApiCallSuccessful); // Set confirmSuccessful to trigger re-render
+            setModalConfirmShow(false); // Close the ModalConfirm component
+            console.log('message:::', message);
+            setToastInfo({
+                title: message.messageTitle,
+                message: message.messageContent,
+                type: message.messageType,
+            });
+            setToastShow(true);
+        },
+        [setToastInfo, setToastShow],
+    );
 
     return (
         <>
+            {/* {console.log('toastInfo:::', toastInfo)} */}
             {isActivate || window.location.href.includes('/filter') ? (
                 <>
+                    {toastInfo ? (
+                        <Toasts title={toastInfo.title} message={toastInfo.message} type={toastInfo.type} />
+                    ) : (
+                        <Toasts title="ERROR" message="Something went wrong" type="danger" />
+                    )}
                     <div className="container-fluid text-center mx-n2">
                         <div className="mt-1 row row-cols-1 row-cols-xl-4 row-cols-lg-3 row-cols-md-2 g-4 justify-content-start">
                             {currentEvent.length > 0 ? (

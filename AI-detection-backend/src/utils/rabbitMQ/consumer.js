@@ -7,7 +7,7 @@ let conn;
 
 const createConnection = async () => {
     if (!conn) {
-        conn = await amqlib.connect(process.env.AMQP_URL_CLOUD_LAB);
+        conn = await amqlib.connect(process.env.AMQP_URL_CLOUD);
     }
 };
 
@@ -20,7 +20,7 @@ const receiveMessage = async () => {
         const channel = await conn.createChannel();
 
         // 3. create name queue
-        const nameQueue = 'message';
+        const nameQueue = process.env.AMQP_MESSAGE_QUEUE;
 
         // 4. create Queue
         await channel.assertQueue(nameQueue, {
@@ -219,6 +219,6 @@ const receiveMessage = async () => {
     }
 };
 
-// receiveMessage();
+receiveMessage();
 
 module.exports = receiveMessage;

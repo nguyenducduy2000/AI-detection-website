@@ -3,6 +3,7 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 
 import updateService from '~/services/updateService';
+// import { useStore } from '~/store';
 
 function ModalConfirm({ show, onHide, data, eventChoice, onApiCallSuccess, ...passProps }) {
     const props = {
@@ -21,9 +22,9 @@ function ModalConfirm({ show, onHide, data, eventChoice, onApiCallSuccess, ...pa
     const getMessage = () => {
         // console.log(eventChoice);
         if (eventChoice && eventChoice.classList.contains('accept-btn')) {
-            return `You are about to Accept ${data.messageId}. Do you want to continue?`;
+            return `You are about to Acknowledge ${data.messageId}. Do you want to continue?`;
         } else if (eventChoice && eventChoice.classList.contains('reject-btn')) {
-            return `You are about to Reject ${data.messageId}. Do you want to continue?`;
+            return `You are about to Dismiss ${data.messageId}. Do you want to continue?`;
         } else if (eventChoice && eventChoice.classList.contains('discard-btn')) {
             return `You are about to Discard Acknowledge ${data.messageId}. Do you want to continue?`;
         }
@@ -31,23 +32,31 @@ function ModalConfirm({ show, onHide, data, eventChoice, onApiCallSuccess, ...pa
 
     const handleConfirm = () => {
         if (eventChoice && eventChoice.classList.contains('accept-btn')) {
-            console.log('accept');
+            // console.log('accept');
             updateService
                 .accept(data.messageId)
                 .then(() => {
                     // console.log('trigger ApiCallSuccess');
-                    onApiCallSuccess();
+                    onApiCallSuccess({
+                        messageTitle: `Acknowledged - ${data.messageId}`,
+                        messageContent: `You have successfully acknowledged ${data.messageId}`,
+                        messageType: 'success',
+                    });
                 })
                 .catch((error) => {
                     console.error(error);
                 });
         } else if (eventChoice && eventChoice.classList.contains('reject-btn')) {
-            console.log('reject');
+            // console.log('reject');
             updateService
                 .reject(data.messageId)
                 .then(() => {
                     // console.log('trigger ApiCallSuccess');
-                    onApiCallSuccess();
+                    onApiCallSuccess({
+                        messageTitle: `Dismissed - ${data.messageId}`,
+                        messageContent: `You have successfully dismissed ${data.messageId}`,
+                        messageType: 'danger',
+                    });
                 })
                 .catch((error) => {
                     console.error(error);
@@ -58,7 +67,11 @@ function ModalConfirm({ show, onHide, data, eventChoice, onApiCallSuccess, ...pa
                 .discardAck(data.messageId)
                 .then(() => {
                     // console.log('trigger ApiCallSuccess');
-                    onApiCallSuccess();
+                    onApiCallSuccess({
+                        messageTitle: `Discarded - ${data.messageId}`,
+                        messageContent: `You have successfully discard acknowledge of event ${data.messageId}`,
+                        messageType: 'warning',
+                    });
                 })
                 .catch((error) => {
                     console.error(error);

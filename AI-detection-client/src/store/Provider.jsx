@@ -34,9 +34,24 @@ const Provider = ({ children }) => {
         localStorage.setItem('isActivate', JSON.stringify(isActivate));
     }, [isActivate]);
 
+    // handleToasts function
+    const [toastInfo, setToastInfo] = useState(null);
+    const [toastShow, setToastShow] = useState(false);
+
     return (
         <Context.Provider
-            value={{ isActivate, setIsActivate, filterParams, setFilterParams, openFilter, setOpenFilter }}
+            value={{
+                isActivate,
+                setIsActivate,
+                filterParams,
+                setFilterParams,
+                openFilter,
+                setOpenFilter,
+                toastInfo,
+                setToastInfo,
+                toastShow,
+                setToastShow,
+            }}
         >
             {children}{' '}
         </Context.Provider>
